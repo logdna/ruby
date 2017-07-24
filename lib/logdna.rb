@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
-require 'Socket'
+require 'socket'
 require_relative 'logdna/client.rb'
 require_relative 'logdna/resources.rb'
 module Logdna

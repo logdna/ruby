@@ -1,6 +1,6 @@
 require 'net/http'
 require 'uri'
-require 'Socket'
+require 'socket'
 require 'json'
 require 'concurrent'
 require 'thread'
