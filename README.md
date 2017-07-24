@@ -44,10 +44,10 @@ to set up the logger.
 Options are optional variables that may contain hostname, app name, mac address, ip address, log level specified.
 
     options = {
-        :hostname => myHostName
-        :ip =>  myIpAddress
-        :mac => myMacAddress
-        :app => myAppName
+        :hostname => myHostName,
+        :ip =>  myIpAddress,
+        :mac => myMacAddress,
+        :app => myAppName,
         :level => "INFO"    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level
     }
 
