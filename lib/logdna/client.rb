@@ -17,8 +17,9 @@ module Logdna
                     :ip =>  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : "",
                     :mac => opts.key?(:mac) ? "&mac=#{opts[:mac]}" : "",
                     :app => (opts[:app] ||= "default"),
-                    :level => (opts[:level] ||= "INFO")
-                }
+                    :level => (opts[:level] ||= "INFO"),
+                    :env => (opts[:env])
+                }.reject { |k,v| k === :env && v.nil? }
 
                 begin
                     if (@qs[:hostname].size > Resources::MAX_INPUT_LENGTH || @qs[:app].size > Resources::MAX_INPUT_LENGTH )
@@ -73,16 +74,15 @@ module Logdna
             rescue Encoding::UndefinedConversionError => e
                 raise e
             end
-
             unless @semaphore.locked?
                 @currentbytesize += msg.bytesize
-
                 @firstbuff.push({
                     :line => msg,
                     :app => @qs[:app],
                     :level => opts[:level] ||= @qs[:level],
                     :timestamp => Time.now.to_i,
-                    :meta => opts[:meta] ||= nil
+                    :meta => opts[:meta] ||= nil,
+                    :env => (opts[:env]) ? opts[:env] : (@qs[:env]) ? @qs[:env] : nil
                 }.reject { |k,v| k === :meta && v.nil? })
             else
                 @secondbytesize += msg.bytesize
@@ -91,7 +91,8 @@ module Logdna
                     :app => @qs[:app],
                     :level => opts[:level] ||= @qs[:level],
                     :timestamp => Time.now.to_i,
-                    :meta => opts[:meta] ||= nil
+                    :meta => opts[:meta] ||= nil,
+                    :env => (opts[:env]) ? opts[:env] : (@qs[:env]) ? @qs[:env] : nil
                 }.reject { |k,v| k === :meta && v.nil? })
             end
 
@@ -108,7 +109,9 @@ module Logdna
                 @response = Net::HTTP.start(@uri.hostname, @uri.port, :use_ssl => @uri.scheme == 'https') do |http|
                   http.request(@request)
                 end
-                puts "Result: #{@response.body}"
+                unless @firstbuff.empty?
+                    puts "Result: #{@response.body}"
+                end
                 @currentbytesize = @secondbytesize
                 @secondbytesize = 0
                 @firstbuff = []

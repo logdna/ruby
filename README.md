@@ -77,6 +77,7 @@ You can also send a metadata with your message by specifying 'meta' field
 
 Hostname and app name cannot be more than 80 characters.
 
+You can search logs by environment in a form of 'env:staging' or '_env:staging' in logdna search bar. 
 
 
 # Important Notes

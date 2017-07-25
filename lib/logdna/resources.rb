@@ -15,4 +15,5 @@ module Resources
     IP_ADDR_CHECK = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
     LOGGER_NOT_CREATED = "LOGGER_NOT_CREATED"
     LOGGER_CREATED = "LOGGER_CREATED"
+
 end
