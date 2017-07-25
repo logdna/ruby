@@ -98,7 +98,7 @@ Instantiates a new instance of the class it is called on. ingestion_key is requi
 |{ :ip => IP address } | Nil |
 |{ :app => App name } | 'default' |
 |{ :level => Log level } | 'INFO' |
-|{ :environment => Staging, Production .. etc} | Nil |
+|{ :env => STAGING, PRODUCTION .. etc} | Nil |
 |{ :flushtime => Log flush interval in seconds } | 0.25 seconds |
 |{ :flushbyte => Log flush upper limit in bytes } | 500000 bytes ~= 0.5 megabytes |
 
