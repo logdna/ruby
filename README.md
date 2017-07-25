@@ -9,8 +9,8 @@
 ---
 
 * **[Installation](#installation)**
+* **[Quick Setup](#quick-setup)**
 * **[API](#api)**
-* **[Development](#development)**
 * **[Contributing](#contributing)**
 * **[License](#license)**
 
@@ -49,6 +49,7 @@ Options are optional variables that may contain hostname, app name, mac address,
         :mac => myMacAddress,
         :app => myAppName,
         :level => "INFO"    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level
+        :env => "PRODUCTION"
     }
 
 
@@ -71,7 +72,7 @@ You can change a particular message's log level.
 
 You can also send a metadata with your message by specifying 'meta' field
 
-    logger.log('This is a message with metadata', {:meta => {:once => {:first => {"nested1", "nested2"}, "second"}}, :level => "TRACE"})
+    logger.log('This is a message with metadata', {:meta => {:once => {:first => "nested1", :another => "nested2"}}, :level => "TRACE"})
 
 
 Hostname and app name cannot be more than 80 characters.
@@ -82,7 +83,6 @@ Hostname and app name cannot be more than 80 characters.
 
 1. This logger assumes that you pass in json formatted data
 2. This logger is a singleton (do not create mutiple instances of the logger) even though the singleton structure is not strongly enforced. 
-
 
 
 # API
@@ -98,6 +98,7 @@ Instantiates a new instance of the class it is called on. ingestion_key is requi
 |{ :ip => IP address } | Nil |
 |{ :app => App name } | 'default' |
 |{ :level => Log level } | 'INFO' |
+|{ :environment => Staging, Production .. etc} | Nil |
 |{ :flushtime => Log flush interval in seconds } | 0.25 seconds |
 |{ :flushbyte => Log flush upper limit in bytes } | 500000 bytes ~= 0.5 megabytes |
 
