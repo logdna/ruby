@@ -25,7 +25,7 @@ module Logdna
         end
 
         at_exit do
-            unless @@client === nil
+            if defined? @@client
                 @@client.exitout()
             end
             exit!
