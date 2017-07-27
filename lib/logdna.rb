@@ -7,7 +7,7 @@ module Logdna
     class Ruby
         def initialize(key, opts={})
             @@client = Logdna::Client.new(key, opts)
-            sleep 0.0001
+            sleep 0.01
             if @@client[:value] === Resources::LOGGER_NOT_CREATED
                 @@client = nil
                 puts "LogDNA logger not created"

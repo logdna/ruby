@@ -39,7 +39,7 @@ module Logdna
                 @actual_byte_limit = opts[:flushbyte] ||= Resources::FLUSH_BYTE_LIMIT
 
                 @url = "#{Resources::ENDPOINT}?hostname=#{@qs[:hostname]}#{@qs[:mac]}#{@qs[:ip]}"
-                @semaphore = Mutex.new
+                @@semaphore = Mutex.new
                 begin
                     @uri = URI(@url)
                 rescue URI::ValidURIRequired => e
@@ -48,8 +48,8 @@ module Logdna
                     return
                 end
 
-                @request = Net::HTTP::Post.new(@uri, 'Content-Type' => 'application/json')
-                @request.basic_auth 'username', key
+                @@request = Net::HTTP::Post.new(@uri, 'Content-Type' => 'application/json')
+                @@request.basic_auth 'username', key
                 self[:value] = Resources::LOGGER_CREATED
             end
         end
@@ -74,7 +74,7 @@ module Logdna
             rescue Encoding::UndefinedConversionError => e
                 raise e
             end
-            unless @semaphore.locked?
+            unless @@semaphore.locked?
                 @currentbytesize += msg.bytesize
                 @firstbuff.push({
                     :line => msg,
@@ -103,25 +103,27 @@ module Logdna
         end
 
         def flush()
-            @semaphore.synchronize {
-                real = {:e => 'ls', :ls => @firstbuff }.to_json
-                @request.body = real
-                @response = Net::HTTP.start(@uri.hostname, @uri.port, :use_ssl => @uri.scheme == 'https') do |http|
-                  http.request(@request)
-                end
-                unless @firstbuff.empty?
-                    puts "Result: #{@response.body}"
-                end
-                @currentbytesize = @secondbytesize
-                @secondbytesize = 0
-                @firstbuff = []
-                @firstbuff = @firstbuff + @secondbuff
-                @secondbuff = []
-                unless @task.nil?
-                    @task.shutdown
-                    @task.kill
-                end
-            }
+            if defined? @@request
+                @@semaphore.synchronize {
+                    real = {:e => 'ls', :ls => @firstbuff }.to_json
+                    @@request.body = real
+                    @response = Net::HTTP.start(@uri.hostname, @uri.port, :use_ssl => @uri.scheme == 'https') do |http|
+                      http.request(@@request)
+                    end
+                    unless @firstbuff.empty?
+                        puts "Result: #{@response.body}"
+                    end
+                    @currentbytesize = @secondbytesize
+                    @secondbytesize = 0
+                    @firstbuff = []
+                    @firstbuff = @firstbuff + @secondbuff
+                    @secondbuff = []
+                    unless @task.nil?
+                        @task.shutdown
+                        @task.kill
+                    end
+                }
+            end
         end
 
         def exitout()
