@@ -54,6 +54,21 @@ module Logdna
             end
         end
 
+        def change(level, app, env)
+            if level
+                if level.is_a? Numeric
+                    level = Resources::LOG_LEVELS[level]
+                end
+                @qs[:level] = level
+            end
+            if app
+                @qs[:app] = app
+            end
+            if env
+                @qs[:env] = env
+            end
+        end
+
         def tobuffer(msg, opts)
             if @task
                 unless @task.running?

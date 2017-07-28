@@ -1,34 +1,28 @@
 require 'require_all'
 require_all 'lib'
 
-options = {
-    :level => "INFO",    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level
-    :flushtime => 0.1,
-    :env => 'PRODUCTION'
-}
 
-options2 = {
-    :level => "INFO",    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level
-    :flushtime => 0.1,
-    :env => 'STAGING'
-}
-
-options3 = {
-    :level => "INFO",    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level
-    :flushtime => 0.1,
-}
-
-options4 = {
-    :level => "INFO",    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level
-    :flushtime => 0.1,
-}
+options = {hostname: "yo", app: "globo-portal", env: "staging"}
 
 
+logger1 = Logdna::Ruby.new('Your Ingestion Key', options)
+logger1.level = Logger::WARN
+logger1.log('This should be warn')
+logger1.trace('This should be trace')
+logger1.log('Again warn level')
 
+logger1.log('Warn level log1')
+logger1.info('Info level log1')
+logger1.level = Logger::DEBUG
+logger1.log('DEBUG log1')
 
-logger = Logdna::Ruby.new('Your Ingestion Key', options);
-logger.log('YOYO');
-logger.log('EQWEJQWIOE');
+logger1.app = 'NEW APP NAME'
+logger1.env = 'Staging'
+logger1.level = 'INFO'
+logger1.log('are changes all updated')
+
+sleep 3
+
 
 
 

@@ -1,6 +1,6 @@
 module Resources
 
-    LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'].freeze
+    LOG_LEVELS = ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'].freeze
     DEFAULT_REQUEST_HEADER = { 'Content-Type': 'application/json; charset=UTF-8' }.freeze
     DEFAULT_REQUEST_TIMEOUT = 180000
     MS_IN_A_DAY = 86400000
