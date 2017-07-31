@@ -69,6 +69,10 @@ module Logdna
             end
         end
 
+        def getLevel
+            @qs[:level].upcase
+        end
+
         def tobuffer(msg, opts)
             if @task
                 unless @task.running?
@@ -93,7 +97,7 @@ module Logdna
                 @currentbytesize += msg.bytesize
                 @firstbuff.push({
                     :line => msg,
-                    :app => @qs[:app],
+                    :app => opts[:app] ||= @qs[:app],
                     :level => opts[:level] ||= @qs[:level],
                     :timestamp => Time.now.to_i,
                     :meta => opts[:meta] ||= nil,
@@ -103,7 +107,7 @@ module Logdna
                 @secondbytesize += msg.bytesize
                 @secondbuff.push({
                     :line => msg,
-                    :app => @qs[:app],
+                    :app => opts[:app] ||= @qs[:app],
                     :level => opts[:level] ||= @qs[:level],
                     :timestamp => Time.now.to_i,
                     :meta => opts[:meta] ||= nil,

@@ -55,16 +55,11 @@ Options are optional variables that may contain hostname, app name, mac address,
 
 To send logs, use "log" method.
 
-    require 'logdna'
-
-    logger = LogDNA::Ruby.new(your_ingestion_key, options)
-    => #<Logdna::Ruby:0x00000000000000>
-
     logger.log('This is my first log')
     => "Saved"  # Saved to buffer. Ready to be flushed automatically
 
 
-By default, it will log at the level of "INFO" unless you specified otherwise during initialzation of the logger. 
+By default, it will log at the level of "INFO" unless you specified otherwise during the initialzation of the logger. 
 You can change a particular message's log level.
 
     logger.log('This is warn message', {:level => "WARN"})
@@ -77,7 +72,21 @@ You can also send a metadata with your message by specifying 'meta' field
 
 Hostname and app name cannot be more than 80 characters.
 
-You can search logs by environment in a form of 'env:staging' or '_env:staging' in logdna search bar. 
+This logger extends the standard Ruby logger and inherits some of the conventions from it. 
+
+    logger.info('This is info log')   # same as logger.log('This is info message', {:level => "INFO"})
+    logger.info? => true
+    logger.trace('trace log')
+    logger.error('error log')
+
+You can also set logger level, environment, app name this way:
+
+    logger.env = 'PRODUCTION'
+    logger.app = 'NEW APP NAME'
+    logger.level = 'FATAL'
+    logger.level = Logger::FATAL
+
+
 
 
 # Important Notes
