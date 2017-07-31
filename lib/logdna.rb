@@ -161,14 +161,14 @@ module Logdna
 
 
         def close
-            if @@client
+            if defined? @@client
                 @@client.exitout()
             end
             exit!
         end
 
         at_exit do
-            if @@client
+            if defined? @@client
                 @@client.exitout()
             end
             exit!
