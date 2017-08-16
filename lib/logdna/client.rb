@@ -18,7 +18,8 @@ module Logdna
                     :mac => opts.key?(:mac) ? "&mac=#{opts[:mac]}" : "",
                     :app => (opts[:app] ||= "default"),
                     :level => (opts[:level] ||= "INFO"),
-                    :env => (opts[:env])
+                    :env => (opts[:env]),
+                    :meta => (opts[:meta])
                 }.reject { |k,v| k === :env && v.nil? }
 
                 begin
@@ -54,7 +55,7 @@ module Logdna
             end
         end
 
-        def change(level, app, env)
+        def change(level, app, env, meta)
             if level
                 if level.is_a? Numeric
                     level = Resources::LOG_LEVELS[level]
@@ -67,6 +68,16 @@ module Logdna
             if env
                 @qs[:env] = env
             end
+            if meta
+                @qs[:meta] = meta
+            end
+        end
+
+        def clear()
+            @qs[:level] = "INFO"
+            @qs[:app] = "default"
+            @qs[:env] = nil
+            @qs[:meta] = nil
         end
 
         def getLevel
@@ -74,51 +85,52 @@ module Logdna
         end
 
         def tobuffer(msg, opts)
-            if @task
-                unless @task.running?
+            unless msg.nil?
+                if @task
+                    unless @task.running?
+                        @task = Concurrent::TimerTask.new(execution_interval: @actual_flush_interval, timeout_interval: Resources::TIMER_OUT){ flush() }
+                        @task.execute
+                    end
+                else
                     @task = Concurrent::TimerTask.new(execution_interval: @actual_flush_interval, timeout_interval: Resources::TIMER_OUT){ flush() }
                     @task.execute
                 end
-            else
-                @task = Concurrent::TimerTask.new(execution_interval: @actual_flush_interval, timeout_interval: Resources::TIMER_OUT){ flush() }
-                @task.execute
-            end
 
-            unless msg.instance_of? String
-                msg = msg.to_s
-            end
+                unless msg.instance_of? String
+                    msg = msg.to_s
+                end
 
-            begin
-                msg = msg.encode("UTF-8")
-            rescue Encoding::UndefinedConversionError => e
-                raise e
-            end
-            unless @@semaphore.locked?
-                @currentbytesize += msg.bytesize
-                @firstbuff.push({
-                    :line => msg,
-                    :app => opts[:app] ||= @qs[:app],
-                    :level => opts[:level] ||= @qs[:level],
-                    :timestamp => Time.now.to_i,
-                    :meta => opts[:meta] ||= nil,
-                    :env => (opts[:env]) ? opts[:env] : (@qs[:env]) ? @qs[:env] : nil
-                }.reject { |k,v| k === :meta && v.nil? })
-            else
-                @secondbytesize += msg.bytesize
-                @secondbuff.push({
-                    :line => msg,
-                    :app => opts[:app] ||= @qs[:app],
-                    :level => opts[:level] ||= @qs[:level],
-                    :timestamp => Time.now.to_i,
-                    :meta => opts[:meta] ||= nil,
-                    :env => (opts[:env]) ? opts[:env] : (@qs[:env]) ? @qs[:env] : nil
-                }.reject { |k,v| k === :meta && v.nil? })
-            end
+                begin
+                    msg = msg.encode("UTF-8")
+                rescue Encoding::UndefinedConversionError => e
+                    raise e
+                end
+                unless @@semaphore.locked?
+                    @currentbytesize += msg.bytesize
+                    @firstbuff.push({
+                        :line => msg,
+                        :app => opts[:app] ||= @qs[:app],
+                        :level => opts[:level] ||= @qs[:level],
+                        :timestamp => Time.now.to_i,
+                        :meta => (opts[:meta]) ? opts[:meta] : (@qs[:meta]) ? @qs[:meta] : nil,
+                        :env => (opts[:env]) ? opts[:env] : (@qs[:env]) ? @qs[:env] : nil,
+                    }.reject { |k,v| k === :meta && v.nil? })
+                else
+                    @secondbytesize += msg.bytesize
+                    @secondbuff.push({
+                        :line => msg,
+                        :app => opts[:app] ||= @qs[:app],
+                        :level => opts[:level] ||= @qs[:level],
+                        :timestamp => Time.now.to_i,
+                        :meta => (opts[:meta]) ? opts[:meta] : (@qs[:meta]) ? @qs[:meta] : nil,
+                        :env => (opts[:env]) ? opts[:env] : (@qs[:env]) ? @qs[:env] : nil,
+                    }.reject { |k,v| k === :meta && v.nil? })
+                end
 
-            if @actual_byte_limit < @currentbytesize
-                flush()
+                if @actual_byte_limit < @currentbytesize
+                    flush()
+                end
             end
-
         end
 
         def flush()

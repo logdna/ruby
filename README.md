@@ -36,7 +36,7 @@ Or install it yourself as:
 
 After installation, call
 
-    logger = Logdna::Ruby.new(your_ingestion_key, options)
+    logger = Logdna::Ruby.new(your_api_key, options)
     => #<Logdna::Ruby:0x00000000000000>
 
 to set up the logger.
@@ -48,45 +48,44 @@ Options are optional variables that may contain hostname, app name, mac address,
         :ip =>  myIpAddress,
         :mac => myMacAddress,
         :app => myAppName,
-        :level => "INFO"    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level
-        :env => "PRODUCTION"
+        :level => "INFO",    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level
+        :env => "PRODUCTION",
+        :meta => {:once => {:first => "nested1", :another => "nested2"}}
     }
 
-
-To send logs, use "log" method.
+To send logs, use "log" method. Default log level is "INFO"
 
     logger.log('This is my first log')
     => "Saved"  # Saved to buffer. Ready to be flushed automatically
 
+Log a message with particular metadata, level, appname, environment (one-time)
 
-By default, it will log at the level of "INFO" unless you specified otherwise during the initialzation of the logger. 
-You can change a particular message's log level.
+    logger.log('This is warn message', {:meta => {:meta => "data"}, :level => "WARN", :app => "awesome", :env => "DEVELOPMENT"})
 
-    logger.log('This is warn message', {:level => "WARN"})
+Log a message with lasting metadata, level, appname, environment (lasting)
 
+    logger.meta = {:once => {:first => "nested1", :another => "nested2"}}
+    logger.level = 'FATAL'  or  logger.level = Logger::FATAL
+    logger.app = 'NEW APP NAME'
+    logger.env = 'PRODUCTION'
+    logger.log('This messages and messages afterwards all have the above values')
 
-You can also send a metadata with your message by specifying 'meta' field
+Clear current metadata, level, appname, environment
 
-    logger.log('This is a message with metadata', {:meta => {:once => {:first => "nested1", :another => "nested2"}}, :level => "TRACE"})
+    logger.clear
+
+Check current log level:
+    
+    logger.info? => true
+    logger.warn? => false
+
+Log a message with a particular level easily
+
+    logger.warn('This is a warning message')
+    logger.fatal('This is a fatal message')
 
 
 Hostname and app name cannot be more than 80 characters.
-
-This logger extends the standard Ruby logger and inherits some of the conventions from it. 
-
-    logger.info('This is info log')   # same as logger.log('This is info message', {:level => "INFO"})
-    logger.info? => true
-    logger.trace('trace log')
-    logger.error('error log')
-
-You can also set logger level, environment, app name this way:
-
-    logger.env = 'PRODUCTION'
-    logger.app = 'NEW APP NAME'
-    logger.level = 'FATAL'
-    logger.level = Logger::FATAL
-
-
 
 
 # Important Notes
@@ -109,6 +108,7 @@ Instantiates a new instance of the class it is called on. ingestion_key is requi
 |{ :app => App name } | 'default' |
 |{ :level => Log level } | 'INFO' |
 |{ :env => STAGING, PRODUCTION .. etc} | Nil |
+|{ :meta => metadata} | Nil |
 |{ :flushtime => Log flush interval in seconds } | 0.25 seconds |
 |{ :flushbyte => Log flush upper limit in bytes } | 500000 bytes ~= 0.5 megabytes |
 

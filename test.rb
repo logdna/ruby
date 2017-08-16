@@ -2,13 +2,40 @@ require 'require_all'
 require_all 'lib'
 
 
-options = {hostname: "yondfsoikplghjniodhnfvreulwignfewfnrleuwinf"}
+options = {hostname: "new", meta:{:once => {:first => "nested1", :another => "nested2"}}}
 
 
-logger1 = Logdna::Ruby.new('Your ingestion key', options)
+logger1 = Logdna::Ruby.new('You API KEY', options)
 
-logger1.level = Logger::TRACE
-logger1.log('is this trace')
+logger1.log('This is the start of test')
+logger1.env = 'STAGING'
+logger1.app = 'HELLO'
+logger1.warn('Warn message with Staging and Hello')
+logger1.clear
+logger1.log('Is everything back to normal?')
+
+
+logger1.log('Testing env app name change using log')
+logger1.env = 'PRODUCTION'
+logger1.app = 'CHANGED'
+logger1.log('This should be stage = PRODUCTION and appname = CHANGED')
+logger1.log('Testing env app name change using other messages')
+
+
+logger1.error('This is error message with env = DEVELOPMENT and appname = NIHAO', {:env => 'DEVELOPMENT', :app => 'NIHAO'})
+logger1.log('Should not stay as DEVELOPMENT and NIHAO')
+logger1.env = 'DEVELOPMENT'
+logger1.app = 'NIHAO'
+logger1.log('Now should be DEVELOPMENT and NIHAO')
+logger1.log('Logging metadata in trace level', {:meta => {:once => {:first => "nested1", :another => "nested2"}}, :level => "TRACE"})
+
+
+logger1.level = Logger::DEBUG
+logger1.log('This is debug message')
+logger1.add('this should not be supported')
+logger1.fatal('Does this continue as fatal?')
+logger1.log('This should be debug')
+
 
 =begin
 logger1.level = Logger::WARN
