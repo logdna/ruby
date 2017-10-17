@@ -12,18 +12,12 @@ module Logdna
 
         def initialize(key, opts)
             super do
-                @qs = {
-                    :hostname => (opts[:hostname] ||= Socket.gethostname),
-                    :ip =>  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : "",
-                    :mac => opts.key?(:mac) ? "&mac=#{opts[:mac]}" : "",
-                    :app => (opts[:app] ||= "default"),
-                    :level => (opts[:level] ||= "INFO"),
-                    :env => (opts[:env]),
-                    :meta => (opts[:meta])
-                }.reject { |k,v| k === :env && v.nil? }
+                hostname = (opts[:hostname] ||= Socket.gethostname),
+                ip =  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : '',
+                mac = opts.key?(:mac) ? "&mac=#{opts[:mac]}" : '',
 
                 begin
-                    if (@qs[:hostname].size > Resources::MAX_INPUT_LENGTH || @qs[:app].size > Resources::MAX_INPUT_LENGTH )
+                    if (hostname.size > Resources::MAX_INPUT_LENGTH || opts[:app].size > Resources::MAX_INPUT_LENGTH )
                         raise MaxLengthExceeded.new
                     end
                 rescue MaxLengthExceeded => e
@@ -39,7 +33,7 @@ module Logdna
                 @actual_flush_interval = opts[:flushtime] ||= Resources::FLUSH_INTERVAL
                 @actual_byte_limit = opts[:flushbyte] ||= Resources::FLUSH_BYTE_LIMIT
 
-                @url = "#{Resources::ENDPOINT}?hostname=#{@qs[:hostname]}#{@qs[:mac]}#{@qs[:ip]}"
+                @url = "#{Resources::ENDPOINT}?hostname=#{hostname}#{mac}#{:ip}"
                 @@semaphore = Mutex.new
                 begin
                     @uri = URI(@url)
@@ -55,33 +49,14 @@ module Logdna
             end
         end
 
-        def change(level, app, env, meta)
-            if level
-                if level.is_a? Numeric
-                    level = Resources::LOG_LEVELS[level]
-                end
-                @qs[:level] = level
-            end
-            if app
-                @qs[:app] = app
-            end
-            if env
-                @qs[:env] = env
-            end
-            if meta
-                @qs[:meta] = meta
-            end
-        end
-
-        def clear()
-            @qs[:level] = "INFO"
-            @qs[:app] = "default"
-            @qs[:env] = nil
-            @qs[:meta] = nil
-        end
-
-        def getLevel
-            @qs[:level].upcase
+        def message_hash(msg, opts={})
+          {
+            line: msg,
+            app: opts[:app],
+            level: opts[:level],
+            env: opts[:env],
+            timestamp: Time.now.to_i,
+          }.reject { |_,v| v.nil? }
         end
 
         def tobuffer(msg, opts)
@@ -107,24 +82,10 @@ module Logdna
                 end
                 unless @@semaphore.locked?
                     @currentbytesize += msg.bytesize
-                    @firstbuff.push({
-                        :line => msg,
-                        :app => opts[:app] ||= @qs[:app],
-                        :level => opts[:level] ||= @qs[:level],
-                        :timestamp => Time.now.to_i,
-                        :meta => (opts[:meta]) ? opts[:meta] : (@qs[:meta]) ? @qs[:meta] : nil,
-                        :env => (opts[:env]) ? opts[:env] : (@qs[:env]) ? @qs[:env] : nil,
-                    }.reject { |k,v| k === :meta && v.nil? })
+                    @firstbuff.push(message_hash(msg, opts))
                 else
                     @secondbytesize += msg.bytesize
-                    @secondbuff.push({
-                        :line => msg,
-                        :app => opts[:app] ||= @qs[:app],
-                        :level => opts[:level] ||= @qs[:level],
-                        :timestamp => Time.now.to_i,
-                        :meta => (opts[:meta]) ? opts[:meta] : (@qs[:meta]) ? @qs[:meta] : nil,
-                        :env => (opts[:env]) ? opts[:env] : (@qs[:env]) ? @qs[:env] : nil,
-                    }.reject { |k,v| k === :meta && v.nil? })
+                    @secondbuff.push(message_hash(msg, opts))
                 end
 
                 if @actual_byte_limit < @currentbytesize
@@ -165,5 +126,3 @@ module Logdna
         end
     end
 end
-
-
