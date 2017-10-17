@@ -1,33 +1,76 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 require 'socket'
+require 'uri'
 require_relative 'logdna/client.rb'
 require_relative 'logdna/resources.rb'
 module Logdna
+    class ValidURLRequired < ArgumentError; end
+    class MaxLengthExceeded < ArgumentError; end
+
     class Ruby < ::Logger
         Logger::TRACE = 5
         attr_accessor :level, :app, :env, :meta
-        @level = nil
-        @app = nil
-        @env = nil
-        @meta = nil
 
         def initialize(key, opts={})
-            @@client = true
-            @@client = Logdna::Client.new(key, opts)
-            sleep 0.01
+            @app = opts[:app] || 'default'
+            @level = opts[:level] || 'INFO'
+            @env = opts[:env]
+            @meta = opts[:meta]
+            @@client = nil
 
-            if @@client[:value] === Resources::LOGGER_NOT_CREATED
-                @@client = nil
-                puts "LogDNA logger not created"
-                return
+            hostname = opts[:hostname] || Socket.gethostname,
+            ip =  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : '',
+            mac = opts.key?(:mac) ? "&mac=#{opts[:mac]}" : '',
+            url = "#{Resources::ENDPOINT}?hostname=#{hostname}#{mac}#{:ip}"
+
+            begin
+              if (hostname.size > Resources::MAX_INPUT_LENGTH || @app.size > Resources::MAX_INPUT_LENGTH )
+                  raise MaxLengthExceeded.new
+              end
+            rescue MaxLengthExceeded => e
+              puts "Hostname or Appname is over #{Resources::MAX_INPUT_LENGTH} characters"
+              handle_exception(e)
+              return
             end
+
+            begin
+              uri = URI(url)
+            rescue URI::ValidURIRequired => e
+              puts "Invalid URL Endpoint: #{url}"
+              handle_exception(e)
+              return
+            end
+
+            begin
+              request = Net::HTTP::Post.new(@uri, 'Content-Type' => 'application/json')
+              request.basic_auth 'username', key
+            rescue => e
+              handle_exception(e)
+              return
+            end
+
+            @@client = Logdna::Client.new(request, uri, opts)
+        end
+
+        def handle_exception(e)
+          exception_message = e.message
+          exception_backtrace = e.backtrace
+          # should log with Ruby logger?
+        end
+
+        def default_opts
+          {
+            app: @app,
+            level: @level,
+            env: @env,
+            meta: @meta,
+          }
         end
 
         def log(msg=nil, opts={})
             loggerExist?
-            optionChanged?
-            @response = @@client.tobuffer(msg, opts)
+            @response = @@client.buffer(msg, default_opts.merge(opts))
             'Saved'
         end
 
@@ -35,30 +78,22 @@ module Logdna
           name = level.downcase
 
           define_method name do |msg=nil, opts={}|
-            opts[:level] = level
-            loggerExist?
-            optionChanged?
-            @response = @@client.tobuffer(msg, opts)
-            'Saved'
+            self.log(msg, opts.merge({
+              level: level,
+            }))
           end
 
           define_method "#{name}?" do
-            loggerExist?
-            unless @level
-                return level == @@client.getLevel
-            end
-            logLevel(level)
+            return Resources::LOG_LEVELS[self.level] == level if self.level.is_a? Numeric
+            self.level == level
           end
         end
 
         def clear
-            loggerExist?
-            @@client.clear()
-            @level = nil
-            @app = nil
-            @env = nil
-            @meta = nil
-            return true
+          @app = 'default'
+          @level = 'INFO'
+          @env = nil
+          @meta = nil
         end
 
         def loggerExist?
@@ -68,29 +103,10 @@ module Logdna
             end
         end
 
-        def optionChanged?
-            if @level || @app || @env || @meta
-                @@client.change(@level, @app, @env, @meta)
-                @level = nil
-                @app = nil
-                @env = nil
-                @meta = nil
-            end
-        end
-
-        def logLevel(comparedTo)
-            if @level.is_a? Numeric
-                @level = Resources::LOG_LEVELS[@level]
-            end
-            return comparedTo == @level.upcase
-        end
-
         def <<(msg=nil, opts={})
-            opts[:level] = ""
-            loggerExist?
-            optionChanged?
-            @response = @@client.tobuffer(msg, opts)
-            'Saved'
+            self.log(msg, opts.merge({
+              level: '',
+            }))
         end
 
         def add(*arg)
@@ -99,11 +115,9 @@ module Logdna
         end
 
         def unknown(msg=nil, opts={})
-            opts[:level] = "UNKNOWN"
-            loggerExist?
-            optionChanged?
-            @response = @@client.tobuffer(msg, opts)
-            'Saved'
+            self.log(msg, opts.merge({
+              level: 'UNKNOWN',
+            }))
         end
 
         def datetime_format(*arg)
@@ -113,17 +127,17 @@ module Logdna
 
 
         def close
-            if defined? @@client
-                @@client.exitout()
-            end
-            exit!
+          unless @@client.nil?
+              @@client.exitout()
+          end
+          exit!
         end
 
         at_exit do
-            if defined? @@client
-                @@client.exitout()
-            end
-            exit!
+          unless @@client.nil?
+              @@client.exitout()
+          end
+          exit!
         end
     end
 end
