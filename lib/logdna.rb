@@ -13,6 +13,7 @@ module Logdna
         @meta = nil
 
         def initialize(key, opts={})
+            @@client = true
             @@client = Logdna::Client.new(key, opts)
             sleep 0.01
 
@@ -30,100 +31,24 @@ module Logdna
             'Saved'
         end
 
-        def trace(msg=nil, opts={})
-            opts[:level] = "TRACE"
+        Resources::LOG_LEVELS.each do |level|
+          name = level.downcase
+
+          define_method name do |msg=nil, opts={}|
+            opts[:level] = level
             loggerExist?
             optionChanged?
             @response = @@client.tobuffer(msg, opts)
             'Saved'
-        end
+          end
 
-        def debug(msg=nil, opts={})
-            opts[:level] = "DEBUG"
-            loggerExist?
-            optionChanged?
-            @response = @@client.tobuffer(msg, opts)
-            'Saved'
-        end
-
-        def info(msg=nil, opts={})
-            opts[:level] = "INFO"
-            loggerExist?
-            optionChanged?
-            @response = @@client.tobuffer(msg, opts)
-            'Saved'
-        end
-
-        def warn(msg=nil, opts={})
-            opts[:level] = "WARN"
-            loggerExist?
-            optionChanged?
-            @response = @@client.tobuffer(msg, opts)
-            'Saved'
-        end
-
-        def error(msg=nil, opts={})
-            opts[:level] = "ERROR"
-            loggerExist?
-            optionChanged?
-            @response = @@client.tobuffer(msg, opts)
-            'Saved'
-        end
-
-        def fatal(msg=nil, opts={})
-            opts[:level] = "FATAL"
-            loggerExist?
-            optionChanged?
-            @response = @@client.tobuffer(msg, opts)
-            'Saved'
-        end
-
-        def trace?
+          define_method "#{name}?" do
             loggerExist?
             unless @level
-                return 'TRACE' == @@client.getLevel
+                return level == @@client.getLevel
             end
-            logLevel('TRACE')
-        end
-
-        def debug?
-            loggerExist?
-            unless @level
-                return 'DEBUG' == @@client.getLevel
-            end
-            logLevel('DEBUG')
-        end
-
-        def info?
-            loggerExist?
-            unless @level
-                return 'INFO' == @@client.getLevel
-            end
-            logLevel('INFO')
-        end
-
-        def warn?
-            loggerExist?
-            unless @level
-                return 'WARN' == @@client.getLevel
-            end
-            logLevel('WARN')
-        end
-
-        def error?
-            loggerExist?
-            unless @level
-                return 'ERROR' == @@client.getLevel
-            end
-            logLevel('ERROR')
-        end
-
-        def fatal?
-            loggerExist?
-            unless @level
-                return 'FATAL' == @@client.getLevel
-            end
-            logLevel('FATAL')
+            logLevel(level)
+          end
         end
 
         def clear
@@ -202,4 +127,3 @@ module Logdna
         end
     end
 end
-
