@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
+# require 'singleton'
 require 'socket'
 require 'uri'
 require_relative 'logdna/client.rb'
@@ -9,6 +10,8 @@ module Logdna
   class MaxLengthExceeded < ArgumentError; end
 
   class Ruby < ::Logger
+    # uncomment line below and line 3 to enforce singleton
+    # include Singleton
     Logger::TRACE = 5
     attr_accessor :level, :app, :env, :meta
 
@@ -17,7 +20,7 @@ module Logdna
       @level = opts[:level] || 'INFO'
       @env = opts[:env]
       @meta = opts[:meta]
-      @@client = nil
+      @@client = nil unless defined? @@client
 
       hostname = opts[:hostname] || Socket.gethostname,
       ip =  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : '',
