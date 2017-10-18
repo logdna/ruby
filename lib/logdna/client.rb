@@ -11,8 +11,11 @@ module Logdna
         @uri = uri
         # NOTE: buffer is in memory
         @buffer = StringIO.new
-        @buffer_over_limit = false
         @messages = []
+        @buffer_over_limit = false
+
+        @side_buffer = StringIO.new
+        @side_messages = []
 
         @lock = Mutex.new
         @task = nil
@@ -48,6 +51,8 @@ module Logdna
     end
 
     def create_flush_task
+      return unless @task.nil? or !@task.running?
+
       t = Concurrent::TimerTask.new(execution_interval: @actual_flush_interval, timeout_interval: Resources::TIMER_OUT) do |task|
         if @messages.any?
           # keep running if there are queued messages, but don't flush
@@ -63,11 +68,28 @@ module Logdna
       t.execute
     end
 
+    def check_side_buffer
+      return if @side_buffer.size == 0
+
+      @buffer.write(@side_buffer.string)
+      @side_buffer.truncate(0)
+      queued_side_messages = @side_messages
+      @side_messages = []
+      queued_side_messages.each { |message_hash_obj| @messages.push(message_hash_obj) }
+    end
+
     # this should always be running synchronously within this thread
     def buffer(msg, opts)
       return if msg.nil?
       msg = encode_message(msg)
 
+      if @lock.locked?
+        @side_buffer.write(msg)
+        @side_messages.push(message_hash(msg, opts))
+        return
+      end
+
+      check_side_buffer
       buffer_size = @buffer.write(msg)
       @messages.push(message_hash(msg, opts))
 
@@ -76,9 +98,7 @@ module Logdna
         flush()
         @buffer_over_limit = false
       else
-        if @task.nil? or !@task.running?
-          @task = create_flush_task
-        end
+        @task = create_flush_task
       end
     end
 
@@ -116,6 +136,7 @@ module Logdna
     end
 
     def exitout()
+      check_side_buffer
       if @messages.any?
         flush()
       end
