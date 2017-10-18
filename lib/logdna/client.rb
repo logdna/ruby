@@ -51,7 +51,7 @@ module Logdna
     end
 
     def create_flush_task
-      return unless @task.nil? or !@task.running?
+      return @task unless @task.nil? or !@task.running?
 
       t = Concurrent::TimerTask.new(execution_interval: @actual_flush_interval, timeout_interval: Resources::TIMER_OUT) do |task|
         if @messages.any?
