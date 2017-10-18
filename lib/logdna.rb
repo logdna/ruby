@@ -46,7 +46,7 @@ module Logdna
       end
 
       begin
-        request = Net::HTTP::Post.new(@uri, 'Content-Type' => 'application/json')
+        request = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
         request.basic_auth 'username', key
       rescue => e
         handle_exception(e)
@@ -59,7 +59,7 @@ module Logdna
     def handle_exception(e)
       exception_message = e.message
       exception_backtrace = e.backtrace
-      # should log with Ruby logger?
+      # NOTE: should log with Ruby logger?
     end
 
     def default_opts
@@ -130,14 +130,14 @@ module Logdna
 
 
     def close
-      unless @@client.nil?
+      if defined? @@client and !@@client.nil?
           @@client.exitout()
       end
       exit!
     end
 
     at_exit do
-      unless @@client.nil?
+      if defined? @@client and !@@client.nil?
           @@client.exitout()
       end
       exit!

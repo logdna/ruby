@@ -9,14 +9,18 @@ module Logdna
     def initialize(request, uri, opts)
       super do
         @uri = uri
-        @firstbuff = []
-        @secondbuff = []
-        @currentbytesize = 0
-        @secondbytesize = 0
-        @actual_flush_interval = opts[:flushtime] ||= Resources::FLUSH_INTERVAL
-        @actual_byte_limit = opts[:flushbyte] ||= Resources::FLUSH_BYTE_LIMIT
+        # NOTE: buffer is in memory
+        @buffer = StringIO.new
+        @buffer_over_limit = false
+        @messages = []
 
-        @@semaphore = Mutex.new
+        @lock = Mutex.new
+        @task = nil
+
+        # NOTE: the byte limit only affects the message, not the entire message_hash
+        @actual_byte_limit = opts[:flushbyte] ||= Resources::FLUSH_BYTE_LIMIT
+        @actual_flush_interval = opts[:flushtime] ||= Resources::FLUSH_INTERVAL
+
         @@request = request
       end
     end
@@ -27,7 +31,7 @@ module Logdna
       begin
           msg = msg.encode("UTF-8")
       rescue Encoding::UndefinedConversionError => e
-        # should this be raised or handled silently?
+        # NOTE: should this be raised or handled silently?
         raise e
       end
       msg
@@ -44,60 +48,77 @@ module Logdna
     end
 
     def create_flush_task
-      Concurrent::TimerTask.new(execution_interval: @actual_flush_interval, timeout_interval: Resources::TIMER_OUT){ flush() }
+      t = Concurrent::TimerTask.new(execution_interval: @actual_flush_interval, timeout_interval: Resources::TIMER_OUT) do |task|
+        if @messages.any?
+          # keep running if there are queued messages, but don't flush
+          # because the buffer is being flushed due to being over the limit
+          unless @buffer_over_limit
+            flush()
+          end
+        else
+          # no messages means we can kill the task
+          task.kill
+        end
+      end
+      t.execute
     end
 
+    # this should always be running synchronously within this thread
     def buffer(msg, opts)
       return if msg.nil?
       msg = encode_message(msg)
 
-      unless @task.present? and @task.running?
-        @task = create_flush_task
-      end
+      buffer_size = @buffer.write(msg)
+      @messages.push(message_hash(msg, opts))
 
-      unless @@semaphore.locked?
-        @currentbytesize += msg.bytesize
-        @firstbuff.push(message_hash(msg, opts))
-      else
-        @secondbytesize += msg.bytesize
-        @secondbuff.push(message_hash(msg, opts))
-      end
-
-      if @actual_byte_limit < @currentbytesize
+      if buffer_size > @actual_byte_limit
+        @buffer_over_limit = true
         flush()
+        @buffer_over_limit = false
+      else
+        if @task.nil? or !@task.running?
+          @task = create_flush_task
+        end
       end
     end
 
+    # this should be running synchronously if @buffer_over_limit i.e. called from self.buffer
+    # else asynchronously through @task
     def flush()
-      if defined? @@request and @@request.present?
-        @@semaphore.synchronize {
-          real = {
-            e: 'ls',
-            ls: @firstbuff,
-          }.to_json
+      if defined? @@request and !@@request.nil?
+        request_messages = []
+        @lock.synchronize do
+          request_messages = @messages
+          @buffer.truncate(0)
+          @messages = []
+        end
+        return if request_messages.empty?
 
-          @@request.body = real
-          @response = Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
-            http.request(@@request)
-          end
+        real = {
+          e: 'ls',
+          ls: request_messages,
+        }.to_json
 
-          puts "Result: #{@response.body}" unless @firstbuff.empty?
+        @@request.body = real
+        @response = Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
+          http.request(@@request)
+        end
 
-          @currentbytesize = @secondbytesize
-          @secondbytesize = 0
-          @firstbuff = []
-          @firstbuff = @firstbuff + @secondbuff
-          @secondbuff = []
-          if @task.present?
-            @task.shutdown
-            @task.kill
-          end
-        }
+        puts "Result: #{@response.body}" unless request_messages.empty?
+
+        # don't kill @task if this was executed from self.buffer
+        # don't kill @task if there are queued messages
+        unless @buffer_over_limit || @messages.any? || @task.nil?
+          @task.shutdown
+          @task.kill
+        end
       end
     end
 
     def exitout()
-      flush()
+      if @messages.any?
+        flush()
+      end
       join
       puts "Exiting LogDNA logger: Logging remaining messages"
       return
