@@ -156,9 +156,6 @@ module Logdna
 
     def exitout()
       check_side_buffer
-      until @queue.empty?
-        queue_to_buffer(@queue)
-      end
       if @messages.any?
         flush()
       end
