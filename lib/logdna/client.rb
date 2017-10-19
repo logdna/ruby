@@ -55,13 +55,16 @@ module Logdna
     end
 
     def message_hash(msg, opts={})
-      {
+      obj = {
         line: msg,
         app: opts[:app],
         level: opts[:level],
         env: opts[:env],
+        meta: opts[:meta],
         timestamp: Time.now.to_i,
-      }.reject { |_,v| v.nil? }
+      }
+      obj.delete(:meta) if obj[:meta].nil?
+      obj
     end
 
     def create_flush_task
