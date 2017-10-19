@@ -4,14 +4,11 @@ require 'json'
 require 'concurrent'
 require 'thread'
 
-NUM_THREADS = 1
-
 module Logdna
   class Client
 
     def initialize(request, uri, opts)
       @uri = uri
-      @queue = Queue.new
 
       # NOTE: buffer is in memory
       @buffer = StringIO.new
@@ -29,17 +26,6 @@ module Logdna
       @actual_flush_interval = opts[:flushtime] ||= Resources::FLUSH_INTERVAL
 
       @@request = request
-
-      @threads = Array.new(NUM_THREADS) do
-        Thread.new do
-          until @queue.empty?
-            buffer_size = queue_to_buffer(@queue)
-            unless @lock.locked?
-              process_buffer(buffer_size)
-            end
-          end
-        end
-      end
     end
 
     def encode_message(msg)
@@ -98,10 +84,10 @@ module Logdna
 
     # this should always be running synchronously within this thread
     def buffer(msg, opts)
-      @queue.push({
-        msg: msg,
-        opts: opts,
-      })
+      buffer_size = write_to_buffer(msg, opts)
+      unless buffer_size.nil?
+        process_buffer(buffer_size)
+      end
     end
 
     def write_to_buffer(msg, opts)
