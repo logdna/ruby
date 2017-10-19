@@ -2,10 +2,10 @@ require 'require_all'
 require_all 'lib'
 
 
-options = {hostname: "new", meta:{:once => {:first => "nested1", :another => "nested2"}}}
+options = {hostname: "new_ruby", meta:{:once => {:first => "nested1", :another => "nested2"}}}
 
 
-logger1 = Logdna::Ruby.new('You API KEY', options)
+logger1 = Logdna::Ruby.new('Your API KEY', options)
 
 logger1.log('This is the start of test')
 logger1.env = 'STAGING'
