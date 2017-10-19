@@ -3,28 +3,42 @@ require 'socket'
 require 'json'
 require 'concurrent'
 require 'thread'
+
+NUM_THREADS = 1
+
 module Logdna
-  class Client < Thread
+  class Client
 
     def initialize(request, uri, opts)
-      super do
-        @uri = uri
-        # NOTE: buffer is in memory
-        @buffer = StringIO.new
-        @messages = []
-        @buffer_over_limit = false
+      @uri = uri
+      @queue = Queue.new
 
-        @side_buffer = StringIO.new
-        @side_messages = []
+      # NOTE: buffer is in memory
+      @buffer = StringIO.new
+      @messages = []
+      @buffer_over_limit = false
 
-        @lock = Mutex.new
-        @task = nil
+      @side_buffer = StringIO.new
+      @side_messages = []
 
-        # NOTE: the byte limit only affects the message, not the entire message_hash
-        @actual_byte_limit = opts[:flushbyte] ||= Resources::FLUSH_BYTE_LIMIT
-        @actual_flush_interval = opts[:flushtime] ||= Resources::FLUSH_INTERVAL
+      @lock = Mutex.new
+      @task = nil
 
-        @@request = request
+      # NOTE: the byte limit only affects the message, not the entire message_hash
+      @actual_byte_limit = opts[:flushbyte] ||= Resources::FLUSH_BYTE_LIMIT
+      @actual_flush_interval = opts[:flushtime] ||= Resources::FLUSH_INTERVAL
+
+      @@request = request
+
+      @threads = Array.new(NUM_THREADS) do
+        Thread.new do
+          until @queue.empty?
+            buffer_size = queue_to_buffer(@queue)
+            unless @lock.locked?
+              process_buffer(buffer_size)
+            end
+          end
+        end
       end
     end
 
@@ -35,7 +49,7 @@ module Logdna
           msg = msg.encode("UTF-8")
       rescue Encoding::UndefinedConversionError => e
         # NOTE: should this be raised or handled silently?
-        raise e
+        # raise e
       end
       msg
     end
@@ -78,8 +92,16 @@ module Logdna
       queued_side_messages.each { |message_hash_obj| @messages.push(message_hash_obj) }
     end
 
+
     # this should always be running synchronously within this thread
     def buffer(msg, opts)
+      @queue.push({
+        msg: msg,
+        opts: opts,
+      })
+    end
+
+    def write_to_buffer(msg, opts)
       return if msg.nil?
       msg = encode_message(msg)
 
@@ -92,7 +114,15 @@ module Logdna
       check_side_buffer
       buffer_size = @buffer.write(msg)
       @messages.push(message_hash(msg, opts))
+      buffer_size
+    end
 
+    def queue_to_buffer(queue=@queue)
+      next_object = queue.shift
+      write_to_buffer(next_object[:msg], next_object[:opts])
+    end
+
+    def process_buffer(buffer_size)
       if buffer_size > @actual_byte_limit
         @buffer_over_limit = true
         flush()
@@ -137,10 +167,13 @@ module Logdna
 
     def exitout()
       check_side_buffer
+      until @queue.empty?
+        queue_to_buffer(@queue)
+      end
       if @messages.any?
         flush()
       end
-      join
+      @threads.each(&:join)
       puts "Exiting LogDNA logger: Logging remaining messages"
       return
     end

@@ -60,6 +60,7 @@ module Logdna
       exception_message = e.message
       exception_backtrace = e.backtrace
       # NOTE: should log with Ruby logger?
+      puts exception_message
     end
 
     def default_opts
@@ -71,24 +72,33 @@ module Logdna
       }
     end
 
+    def level=(value)
+      if value.is_a? Numeric
+        @level = Resources::LOG_LEVELS[value]
+        return
+      end
+
+      @level = value
+    end
+
     def log(msg=nil, opts={})
       loggerExist?
       @response = @@client.buffer(msg, default_opts.merge(opts))
       'Saved'
     end
 
-    Resources::LOG_LEVELS.each do |level|
-      name = level.downcase
+    Resources::LOG_LEVELS.each do |lvl|
+      name = lvl.downcase
 
       define_method name do |msg=nil, opts={}|
         self.log(msg, opts.merge({
-          level: level,
+          level: lvl,
         }))
       end
 
       define_method "#{name}?" do
-        return Resources::LOG_LEVELS[self.level] == level if self.level.is_a? Numeric
-        self.level == level
+        return Resources::LOG_LEVELS[self.level] == lvl if self.level.is_a? Numeric
+        self.level == lvl
       end
     end
 
