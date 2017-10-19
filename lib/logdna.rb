@@ -22,10 +22,10 @@ module Logdna
       @meta = opts[:meta]
       @@client = nil unless defined? @@client
 
-      hostname = opts[:hostname] || Socket.gethostname,
-      ip =  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : '',
-      mac = opts.key?(:mac) ? "&mac=#{opts[:mac]}" : '',
-      url = "#{Resources::ENDPOINT}?hostname=#{hostname}#{mac}#{:ip}"
+      hostname = opts[:hostname] || Socket.gethostname
+      ip =  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : ''
+      mac = opts.key?(:mac) ? "&mac=#{opts[:mac]}" : ''
+      url = "#{Resources::ENDPOINT}?hostname=#{hostname}#{mac}#{ip}"
 
       begin
         if (hostname.size > Resources::MAX_INPUT_LENGTH || @app.size > Resources::MAX_INPUT_LENGTH )
@@ -83,7 +83,9 @@ module Logdna
 
     def log(msg=nil, opts={})
       loggerExist?
-      @response = @@client.buffer(msg, default_opts.merge(opts))
+      @response = @@client.buffer(msg, default_opts.merge(opts).merge({
+            timestamp: (Time.now.to_f * 1000).to_i
+        }))
       'Saved'
     end
 
