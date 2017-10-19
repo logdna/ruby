@@ -46,7 +46,7 @@ module Logdna
       end
 
       begin
-        request = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+        request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
         request.basic_auth 'username', key
       rescue => e
         handle_exception(e)
