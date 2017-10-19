@@ -159,7 +159,6 @@ module Logdna
       if @messages.any?
         flush()
       end
-      @threads.each(&:join)
       puts "Exiting LogDNA logger: Logging remaining messages"
       return
     end
