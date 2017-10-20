@@ -6,8 +6,8 @@ require 'logdna/version'
 Gem::Specification.new do |spec|
   spec.name          = 'logdna'
   spec.version       = LogDNA::VERSION
-  spec.authors       = 'Gun Woo Choi'
-  spec.email         = 'matt.choi@logdna.com'
+  spec.authors       = 'Gun Woo Choi, Derek Zhou'
+  spec.email         = 'support@logdna.com'
 
   spec.summary       = 'LogDNA Ruby logger'
   spec.homepage      = 'https://github.com/logdna/ruby'
@@ -20,7 +20,9 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
+
   spec.add_runtime_dependency 'concurrent-ruby', '~> 1.0'
+  spec.add_runtime_dependency 'require_all', '~> 1.4'
   spec.add_runtime_dependency 'json', '~> 2.0'
 
   spec.add_development_dependency 'bundler', '~> 1.13'
