@@ -145,14 +145,12 @@ module Logdna
       if defined? @@client and !@@client.nil?
           @@client.exitout()
       end
-      exit!
     end
 
     at_exit do
       if defined? @@client and !@@client.nil?
           @@client.exitout()
       end
-      exit!
     end
   end
 end

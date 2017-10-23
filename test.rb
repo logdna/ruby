@@ -5,9 +5,9 @@ require_all 'lib'
 options = {hostname: "new_ruby", meta:{:once => {:first => "nested1", :another => "nested2"}}}
 
 
-logger1 = Logdna::Ruby.new('Your API KEY', options)
+logger1 = Logdna::Ruby.new('Your API Key', options)
 
-logger1.log('This is the start of test')
+logger1.log('**************** This is the start of test ****************')
 logger1.env = 'STAGING'
 logger1.app = 'HELLO'
 logger1.warn('Warn message with Staging and Hello')
@@ -35,6 +35,8 @@ logger1.log('This is debug message')
 logger1.add('this should not be supported')
 logger1.fatal('Does this continue as fatal?')
 logger1.log('This should be debug')
+logger1.level = Logger::WARN
+logger1.log('**************** This is the end of test ****************')
 
 
 =begin

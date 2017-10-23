@@ -143,8 +143,6 @@ module Logdna
           http.request(@@request)
         end
 
-        puts "Result: #{@response.body}" unless request_messages.empty?
-
         # don't kill @task if this was executed from self.buffer
         # don't kill @task if there are queued messages
         unless @buffer_over_limit || @messages.any? || @task.nil?
