@@ -58,6 +58,11 @@ To send logs, use "log" method. Default log level is "INFO"
     logger.log('This is my first log')
     => "Saved"  # Saved to buffer. Ready to be flushed automatically
 
+Optionally you can use a block to do so
+
+    logger.log { 'This is my second log' }
+    => "Saved"
+
 Log a message with particular metadata, level, appname, environment (one-time)
 
     logger.log('This is warn message', {:meta => {:meta => "data"}, :level => "WARN", :app => "awesome", :env => "DEVELOPMENT"})
@@ -83,6 +88,7 @@ Log a message with a particular level easily
 
     logger.warn('This is a warning message')
     logger.fatal('This is a fatal message')
+    logger.debug { 'This is a debug message' }
 
 
 Hostname and app name cannot be more than 80 characters.
