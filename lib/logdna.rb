@@ -83,7 +83,8 @@ module Logdna
 
     def log(msg=nil, opts={})
       loggerExist?
-      @response = @@client.buffer(msg, default_opts.merge(opts).merge({
+      message = yield if msg.nil? && block_given?
+      @response = @@client.buffer(message, default_opts.merge(opts).merge({
             timestamp: (Time.now.to_f * 1000).to_i
         }))
       'Saved'
@@ -92,10 +93,10 @@ module Logdna
     Resources::LOG_LEVELS.each do |lvl|
       name = lvl.downcase
 
-      define_method name do |msg=nil, opts={}|
+      define_method name do |msg=nil, opts={}, &block|
         self.log(msg, opts.merge({
           level: lvl,
-        }))
+        }), &block)
       end
 
       define_method "#{name}?" do
