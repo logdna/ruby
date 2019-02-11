@@ -21,8 +21,8 @@ module Logdna
       @env = opts[:env]
       @meta = opts[:meta]
       @@client = nil unless defined? @@client
-      @endpoint = opts[:endpoint] || Resources::ENDPOINT
-
+      
+      endpoint = opts[:endpoint] || Resources::ENDPOINT
       hostname = opts[:hostname] || Socket.gethostname
       ip =  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : ''
       mac = opts.key?(:mac) ? "&mac=#{opts[:mac]}" : ''
