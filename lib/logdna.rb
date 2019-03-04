@@ -84,6 +84,7 @@ module Logdna
 
     def log(msg=nil, opts={})
       loggerExist?
+      message = msg
       message = yield if msg.nil? && block_given?
       @response = @@client.buffer(message, default_opts.merge(opts).merge({
             timestamp: (Time.now.to_f * 1000).to_i
