@@ -50,7 +50,8 @@ Options are optional variables that may contain hostname, app name, mac address,
         :app => myAppName,
         :level => "INFO",    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level
         :env => "PRODUCTION",
-        :meta => {:once => {:first => "nested1", :another => "nested2"}}
+        :meta => {:once => {:first => "nested1", :another => "nested2"}},
+        :endpoint => "https://fqdn/logs/ingest"
     }
 
 To send logs, use "log" method. Default log level is "INFO"
@@ -99,7 +100,6 @@ Hostname and app name cannot be more than 80 characters.
 1. This logger assumes that you pass in json formatted data
 2. This logger is a singleton (do not create mutiple instances of the logger) even though the singleton structure is not strongly enforced. 
 
-
 # API
 
 ## Logdna::Ruby.new(ingestion_key, options = {})
@@ -115,6 +115,7 @@ Instantiates a new instance of the class it is called on. ingestion_key is requi
 |{ :level => Log level } | 'INFO' |
 |{ :env => STAGING, PRODUCTION .. etc} | Nil |
 |{ :meta => metadata} | Nil |
+|{ :endpoint => LogDNA Ingestion URI | 'https://logs.logdna.com/logs/ingest' |
 |{ :flushtime => Log flush interval in seconds } | 0.25 seconds |
 |{ :flushbyte => Log flush upper limit in bytes } | 500000 bytes ~= 0.5 megabytes |
 
