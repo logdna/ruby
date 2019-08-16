@@ -66,6 +66,8 @@ module Logdna
           @side_messages.push(process_message(msg, opts))
         end
       end
+      timer_task.execute
+      timer_task
     end
 
     # This method has to be called with @lock
