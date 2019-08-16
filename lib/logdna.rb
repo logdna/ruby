@@ -22,23 +22,22 @@ module Logdna
       @level = opts[:level] || "INFO"
       @env = opts[:env]
       @meta = opts[:meta]
+
       endpoint = opts[:endpoint] || Resources::ENDPOINT
       hostname = opts[:hostname] || Socket.gethostname
-
-      if hostname.size > Resources::MAX_INPUT_LENGTH || @app.size > Resources::MAX_INPUT_LENGTH
-        puts "Hostname or Appname is over #{Resources::MAX_INPUT_LENGTH} characters"
-        return
-      end
-
-      ip =  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : ""
-      mac = opts.key?(:mac) ? "&mac=#{opts[:mac]}" : ""
+      ip =  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : ''
+      mac = opts.key?(:mac) ? "&mac=#{opts[:mac]}" : ''
       url = "#{endpoint}?hostname=#{hostname}#{mac}#{ip}"
       uri = URI(url)
 
-      request = Net::HTTP::Post.new(uri.request_uri, "Content-Type" => "application/json")
-      request.basic_auth("username", key)
-      request[:'user-agent'] = opts[:'user-agent'] || "ruby/#{LogDNA::VERSION}"
-      @client = Logdna::Client.new(request, uri, opts)
+      if (hostname.size > Resources::MAX_INPUT_LENGTH || @app.size > Resources::MAX_INPUT_LENGTH )
+        puts "Hostname or Appname is over #{Resources::MAX_INPUT_LENGTH} characters"
+      end
+
+      request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
+      request.basic_auth 'username', key
+
+      @@client = Logdna::Client.new(request, uri, opts)
     end
 
     def default_opts
@@ -59,18 +58,16 @@ module Logdna
       @level = value
     end
 
-    def log(message = nil, opts = {})
-      if message.nil? && block_given?
-        message = yield
-      end
-      if message.nil?
-        puts "provide either a message or block"
+    def log(message, opts={})
+      if(message.length == 0)
+        puts "Your logline cannot be empty"
         return
       end
-      message = message.to_s.encode("UTF-8")
-      @client.write_to_buffer(message, default_opts.merge(opts).merge(
-                                         timestamp: (Time.now.to_f * 1000).to_i
-                                       ))
+      message = message.to_s unless message.instance_of? String
+      message = message.encode("UTF-8")
+      @@client.write_to_buffer(message, default_opts.merge(opts).merge({
+            timestamp: (Time.now.to_f * 1000).to_i
+      }))
     end
 
     Resources::LOG_LEVELS.each do |lvl|
@@ -96,10 +93,10 @@ module Logdna
       @meta = nil
     end
 
-    def <<(msg = nil, opts = {})
-      log(msg, opts.merge(
-                 level: ""
-               ))
+    def <<(msg=nil, opts={})
+      self.log(msg, opts.merge({
+        level: '',
+      }))
     end
 
     def add(*_arg)
@@ -125,8 +122,8 @@ module Logdna
     end
 
     at_exit do
-      if !@client.nil?
-        @client.exitout
+      if defined? @@client and !@@client.nil?
+          #@@client.exitout()
       end
     end
   end

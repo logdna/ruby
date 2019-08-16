@@ -8,6 +8,7 @@ module Resources
   MAX_INPUT_LENGTH = 80
   RETRY_TIMEOUT = 60
   FLUSH_INTERVAL = 0.25
+  TIMER_OUT = 120
   FLUSH_BYTE_LIMIT = 500000
   ENDPOINT = 'https://logs.logdna.com/logs/ingest'.freeze
   MAC_ADDR_CHECK = /^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$/
