@@ -135,7 +135,7 @@ module Logdna
       else
         schedule_flush
       end
-    end
+   end
 
     def exitout
       flush
