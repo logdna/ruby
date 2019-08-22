@@ -19,9 +19,12 @@ module Logdna
       @lock = Mutex.new
       @flush_limit = opts[:flush_size] ||= Resources::FLUSH_BYTE_LIMIT
       @flush_interval = opts[:flush_interval] ||= Resources::FLUSH_INTERVAL
+      @flush_scheduled = false
+      @exception_flag = false
 
-      @@request = request
+      @request = request
       @timer_task = false
+      @backoff_interval = opts[:backoff_period] ||= Resources::BACKOFF_PERIOD
     end
 
     def process_message(msg, opts={})
@@ -38,83 +41,88 @@ module Logdna
     end
 
     def create_flush_task
-      puts "calls"
-      timer_task = Concurrent::TimerTask.new(execution_interval: @flush_interval, timeout_interval: Resources::TIMER_OUT) do |task|
-          puts 'executing'
-          self.flush
+        timer_task = Concurrent::TimerTask.new(execution_interval: @flush_interval, timeout_interval: Resources::TIMER_OUT) do |task|
+            puts 'executing'
+            self.flush
+        end
+        timer_task.execute
+    end
+
+    def schedule_flush
+      def start_timer
+        sleep(@exception_flag ? @backoff_period : @flush_interval)
+        flush
       end
-      timer_task.execute
-      timer_task
+      thread = Thread.new{ start_timer }
+      thread.join
     end
 
     def write_to_buffer(msg, opts)
-      puts 'log received'
       if @lock.try_lock
           if !@side_messages.empty?
             @buffer.concat(@side_messages)
           end
-
-          if @timer_task == false
-            @timer_task = Thread.new { self.create_flush_task }
-            @timer_task.join
-            puts "inside if block"
-            puts @timer_task.status
-          end
-          puts "in buffer method"
-          puts @timer_task.status
-          processes_message = process_message(msg, opts)
-          new_message_size = processes_message.to_s.bytesize
+          processed_message = process_message(msg, opts)
+          new_message_size = processed_message.to_s.bytesize
           @buffer_byte_size += new_message_size
 
           if @flush_limit > (new_message_size + @buffer_byte_size)
-            @buffer.push(processes_message)
+             @buffer.push(processed_message)
           else
-            puts "calls from here?"
-             @buffer.push(processes_message)
+             @buffer.push(processed_message)
              self.flush
           end
+
+          begin
+            @lock.unlock
+          rescue
+            puts 'Nothing was locked'
+          end
+          schedule_flush()
       else
           @side_messages.push(process_message(msg, opts))
       end
 
-    # this should be running synchronously if @buffer_over_limit i.e. called from self.buffer
-    # else asynchronously through @task
     def flush
-      puts "in flush method"
-      puts @timer_task.status
       return if @buffer.empty?
-      @@request.body = {
-        e: 'ls',
-        ls: @buffer,
-      }.to_json
+      if @lock.try_lock
+        @request.body = {
+          e: 'ls',
+          ls: @buffer.concat(@side_messages),
+        }.to_json
+        @timer_task = false
+        @side_messages.clear
 
-      @buffer.clear
-    #  @timer_task.shutdown if !@timer_task.nil?
-      puts 'log is flushed'
-      @response = Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
-        http.request(@@request)
+        begin
+          @response = Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
+            http.request(@request)
+          end
+          @exception_flag = false
+        rescue
+          puts `Error at the attempt to send the request #{@response.body if @response}`
+          @exception_flag = true
+          @side_messages.concat(@buffer)
+        end
+        @buffer.clear
+
+        begin
+          @lock.unlock
+        rescue
+          puts 'Nothing was locked'
+        end
       end
+   end
 
-      if @response.code != '200'
-        @buffer.concat(@@request.ls)
-        @@request.body = nil
-        # check what is request and clear it if still contains data
-        puts `Error at the attempt to send the request #{@response.body}`
-      end
-
-      begin
-        @lock.unlock
-      rescue
-        puts 'Nothing was locked'
-      end
-    end
-
-    def exitout
-      puts @timer_task.status
+   def exitout
       if @buffer.any?
         flush()
       end
+<<<<<<< HEAD
       puts "Exiting LogDNA logger: Logging remaining messages"
+=======
+        puts "Exiting LogDNA logger: Logging remaining messages"
+      return
+>>>>>>> savingBranch
     end
   end
 end

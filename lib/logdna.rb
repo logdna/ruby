@@ -115,6 +115,7 @@ module Logdna
       false
     end
 
+<<<<<<< HEAD
     def close
       if !@client.nil?
         @client.exitout
@@ -126,5 +127,19 @@ module Logdna
           #@@client.exitout()
       end
     end
+=======
+
+    # def close
+    #   if defined? @@client and !@@client.nil?
+    #       @@client.exitout()
+    #   end
+    # end
+    #
+    # at_exit do
+    #   if defined? @@client and !@@client.nil?
+    #       @@client.exitout()
+    #   end
+    # end
+>>>>>>> savingBranch
   end
 end
