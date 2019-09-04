@@ -24,7 +24,6 @@ module Logdna
       @exception_flag = false
 
       @request = request
-      @timer_task = false
       @retry_timeout = opts[:retry_timeout] ||= Resources::RETRY_TIMEOUT
     end
 
@@ -66,11 +65,8 @@ module Logdna
              @buffer.push(processed_message)
              self.flush
           end
+          @lock.unlock if @lock.locked?
 
-          begin
-            @lock.unlock
-          rescue
-          end
           schedule_flush() if !@flush_scheduled
       else
           @side_messages.push(process_message(msg, opts))
@@ -78,14 +74,12 @@ module Logdna
     end
 
     def flush
-      puts (@buffer)
       return if @buffer.empty?
       if @lock.try_lock
         @request.body = {
           e: 'ls',
           ls: @buffer.concat(@side_messages),
         }.to_json
-        @timer_task = false
         @side_messages.clear
 
         begin
@@ -101,10 +95,7 @@ module Logdna
         @flush_scheduled = false
         @buffer.clear
 
-        begin
-          @lock.unlock
-        rescue
-        end
+        @lock.unlock if @lock.locked?
       end
    end
 
