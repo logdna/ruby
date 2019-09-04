@@ -59,12 +59,11 @@ module Logdna
     end
 
     def log(message, opts={})
-      if(message.length == 0)
+      if (message.length == 0)
         puts "Your logline cannot be empty"
         return
       end
-      message = message.to_s unless message.instance_of? String
-      message = message.encode("UTF-8")
+      message = message.to_s.encode("UTF-8")
       @@client.write_to_buffer(message, default_opts.merge(opts).merge({
             timestamp: (Time.now.to_f * 1000).to_i
       }))

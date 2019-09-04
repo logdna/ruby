@@ -69,7 +69,6 @@ module Logdna
           begin
             @lock.unlock
           rescue
-            puts 'Nothing was locked'
           end
           schedule_flush() if !@flush_scheduled
       else
@@ -77,6 +76,7 @@ module Logdna
       end
 
     def flush
+      puts (@buffer)
       return if @buffer.empty?
       if @lock.try_lock
         @request.body = {
@@ -102,7 +102,6 @@ module Logdna
         begin
           @lock.unlock
         rescue
-          puts 'Nothing was locked'
         end
       end
    end
