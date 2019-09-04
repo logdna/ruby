@@ -24,7 +24,7 @@ module Logdna
 
       @request = request
       @timer_task = false
-      @backoff_interval = opts[:backoff_period] ||= Resources::BACKOFF_PERIOD
+      @backoff_interval = opts[:RETRY_TIMEOUT] ||= Resources::RETRY_TIMEOUT
     end
 
     def process_message(msg, opts={})
@@ -40,17 +40,9 @@ module Logdna
       processedMessage
     end
 
-    def create_flush_task
-        timer_task = Concurrent::TimerTask.new(execution_interval: @flush_interval, timeout_interval: Resources::TIMER_OUT) do |task|
-            puts 'executing'
-            self.flush
-        end
-        timer_task.execute
-    end
-
     def schedule_flush
       def start_timer
-        sleep(@exception_flag ? @backoff_period : @flush_interval)
+        sleep(@exception_flag ? @RETRY_TIMEOUT : @flush_interval)
         flush
       end
       thread = Thread.new{ start_timer }
