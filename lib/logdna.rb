@@ -35,7 +35,7 @@ module Logdna
       end
 
       request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
-      request.basic_auth 'username', key
+      request.basic_auth('username', key)
 
       @@client = Logdna::Client.new(request, uri, opts)
     end
