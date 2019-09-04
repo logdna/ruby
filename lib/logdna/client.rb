@@ -25,7 +25,7 @@ module Logdna
 
       @request = request
       @timer_task = false
-      @backoff_interval = opts[:RETRY_TIMEOUT] ||= Resources::RETRY_TIMEOUT
+      @retry_timeout = opts[:retry_timeout] ||= Resources::RETRY_TIMEOUT
     end
 
     def process_message(msg, opts={})
@@ -42,8 +42,9 @@ module Logdna
     end
 
     def schedule_flush
+      @flush_scheduled = true
       def start_timer
-        sleep(@exception_flag ? @RETRY_TIMEOUT : @flush_interval)
+        sleep(@exception_flag ? @retry_timeout : @flush_interval)
         flush
       end
       thread = Thread.new{ start_timer }
@@ -71,7 +72,7 @@ module Logdna
           rescue
             puts 'Nothing was locked'
           end
-          schedule_flush()
+          schedule_flush() if !@flush_scheduled
       else
           @side_messages.push(process_message(msg, opts))
       end
@@ -93,10 +94,11 @@ module Logdna
           end
           @exception_flag = false
         rescue
-          puts `Error at the attempt to send the request #{@response.body if @response}`
+          p "Error at the attempt to send the request #{@response.body if @response}"
           @exception_flag = true
           @side_messages.concat(@buffer)
         end
+        @flush_scheduled = false
         @buffer.clear
 
         begin
