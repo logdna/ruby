@@ -18,8 +18,8 @@ module Logdna
       @side_messages = []
 
       @lock = Mutex.new
-      @flush_limit = opts[:flush_size] ||= Resources::FLUSH_BYTE_LIMIT
-      @flush_interval = opts[:flush_interval] ||= Resources::FLUSH_INTERVAL
+      @flush_limit = opts[:flush_size] ? opts[:flush_size] : Resources::FLUSH_BYTE_LIMIT
+      @flush_interval = opts[:flush_interval] ? opts[:flush_interval] : Resources::FLUSH_INTERVAL
       @flush_scheduled = false
       @exception_flag = false
 
