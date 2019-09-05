@@ -81,21 +81,35 @@ module Logdna
           ls: @buffer.concat(@side_messages),
         }.to_json
         @side_messages.clear
+        @flush_scheduled = false
 
         begin
           @response = Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
             http.request(@request)
           end
+
+          if(@response.is_a?(Net::HTTPForbidden))
+            p "Please provide a valid ingestion key"
+          elsif(!@response.is_a?(Net::HTTPSuccess))
+            p "The response is not successful #{}"
+          end
           @exception_flag = false
-        rescue
-          p "Error at the attempt to send the request #{@response.body if @response}"
+        rescue SocketError
+          p "Network connectivity issue"
           @exception_flag = true
           @side_messages.concat(@buffer)
+        rescue Errno::ECONNREFUSED => e
+          puts "The server is down. #{e.message}"
+          @exception_flag = true
+          @side_messages.concat(@buffer)
+        rescue Timeout::Error => e
+          puts "Timeout error occurred. #{e.message}"
+          @exception_flag = true
+          @side_messages.concat(@buffer)
+        ensure
+          @buffer.clear
+          @lock.unlock if @lock.locked?
         end
-        @flush_scheduled = false
-        @buffer.clear
-
-        @lock.unlock if @lock.locked?
       end
    end
 
