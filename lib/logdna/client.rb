@@ -87,6 +87,13 @@ module Logdna
         @exception_flag = true
         @side_message_lock.synchronize do
           @side_messages.concat(@buffer)
+        rescue Timeout::Error => e
+          puts "Timeout error occurred. #{e.message}"
+          @exception_flag = true
+          @side_messages.concat(@buffer)
+        ensure
+          @buffer.clear
+          @lock.unlock if @lock.locked?
         end
       end
 
