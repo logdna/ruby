@@ -23,7 +23,8 @@ module Logdna
       @exception_flag = false
 
       @request = request
-      @retry_timeout = opts[:retry_timeout] ||= Resources::RETRY_TIMEOUT
+      @timer_task = false
+      @backoff_interval = opts[:backoff_period] ||= Resources::BACKOFF_PERIOD
     end
 
     def process_message(msg, opts={})
@@ -39,10 +40,17 @@ module Logdna
       processedMessage
     end
 
+    def create_flush_task
+        timer_task = Concurrent::TimerTask.new(execution_interval: @flush_interval, timeout_interval: Resources::TIMER_OUT) do |task|
+            puts 'executing'
+            self.flush
+        end
+        timer_task.execute
+    end
+
     def schedule_flush
-      @flush_scheduled = true
       def start_timer
-        sleep(@exception_flag ? @retry_timeout : @flush_interval)
+        sleep(@exception_flag ? @backoff_period : @flush_interval)
         flush
       end
       thread = Thread.new{ start_timer }
@@ -64,9 +72,13 @@ module Logdna
              @buffer.push(processed_message)
              self.flush
           end
-          @lock.unlock if @lock.locked?
 
-          schedule_flush() if !@flush_scheduled
+          begin
+            @lock.unlock
+          rescue
+            puts 'Nothing was locked'
+          end
+          schedule_flush()
       else
           @side_messages.push(process_message(msg, opts))
       end
@@ -78,35 +90,25 @@ module Logdna
           e: 'ls',
           ls: @buffer.concat(@side_messages),
         }.to_json
+        @timer_task = false
         @side_messages.clear
-        @flush_scheduled = false
 
         begin
           @response = Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
             http.request(@request)
           end
-
-          if(@response.is_a?(Net::HTTPForbidden))
-            p "Please provide a valid ingestion key"
-          elsif(!@response.is_a?(Net::HTTPSuccess))
-            p "The response is not successful #{}"
-          end
           @exception_flag = false
-        rescue SocketError
-          p "Network connectivity issue"
+        rescue
+          puts `Error at the attempt to send the request #{@response.body if @response}`
           @exception_flag = true
           @side_messages.concat(@buffer)
-        rescue Errno::ECONNREFUSED => e
-          puts "The server is down. #{e.message}"
-          @exception_flag = true
-          @side_messages.concat(@buffer)
-        rescue Timeout::Error => e
-          puts "Timeout error occurred. #{e.message}"
-          @exception_flag = true
-          @side_messages.concat(@buffer)
-        ensure
-          @buffer.clear
-          @lock.unlock if @lock.locked?
+        end
+        @buffer.clear
+
+        begin
+          @lock.unlock
+        rescue
+          puts 'Nothing was locked'
         end
       end
    end
@@ -115,12 +117,8 @@ module Logdna
       if @buffer.any?
         flush()
       end
-<<<<<<< HEAD
-      puts "Exiting LogDNA logger: Logging remaining messages"
-=======
         puts "Exiting LogDNA logger: Logging remaining messages"
       return
->>>>>>> savingBranch
     end
   end
 end

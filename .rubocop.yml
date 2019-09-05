@@ -5,7 +5,7 @@ Metrics/LineLength:
 # Too short methods lead to extraction of single-use methods, which can make
 # the code easier to read (by naming things), but can also clutter the class
 Metrics/MethodLength:
-  Max: 100
+  Max: 40
 
 # The guiding principle of classes is SRP, SRP can't be accurately measured by LoC
 Metrics/ClassLength:
@@ -22,10 +22,11 @@ Metrics/PerceivedComplexity:
 
 # No space makes the method definition shorter and differentiates
 # from a regular assignment.
-
-Layout/AccessModifierIndentation:
-  Enabled: true
-  IndentationWidth: 4
+Style/Layout:
+  EnforcedStyle: no_space
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+  SpaceBeforeBlockParameters: false
 
 # Single quotes being faster is hardly measurable and only affects parse time.
 # Enforcing double quotes reduces the times where you need to change them
@@ -56,11 +57,6 @@ Style/CollectionMethods:
     # inject seems more common in the community.
     reduce: "inject"
 
-Style/RedundantInterpolation:
-  Enabled: false
-
-Style/RescueStandardError:
-    Enabled: false
 
 # Either allow this style or don't. Marking it as safe with parenthesis
 # is silly. Let's try to live without them for now.
@@ -83,7 +79,7 @@ Style/SignalException:
 # Suppressing exceptions can be perfectly fine, and be it to avoid to
 # explicitly type nil into the rescue since that's what you want to return,
 # or suppressing LoadError for optional dependencies
-Lint/SuppressedException:
+Lint/HandleExceptions:
   Enabled: false
 
 # { ... } for multi-line blocks is okay, follow Weirichs rule instead:
@@ -125,7 +121,4 @@ Lint/Debugger:
 
 # Style preference
 Style/MethodDefParentheses:
-  Enabled: false
-
-Style/TrailingCommaInHashLiteral:
   Enabled: false

@@ -35,7 +35,7 @@ module Logdna
       end
 
       request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
-      request.basic_auth('username', key)
+      request.basic_auth 'username', key
 
       @@client = Logdna::Client.new(request, uri, opts)
     end
@@ -59,11 +59,12 @@ module Logdna
     end
 
     def log(message, opts={})
-      if (message.length == 0)
+      if(message.length == 0)
         puts "Your logline cannot be empty"
         return
       end
-      message = message.to_s.encode("UTF-8")
+      message = message.to_s unless message.instance_of? String
+      message = message.encode("UTF-8")
       @@client.write_to_buffer(message, default_opts.merge(opts).merge({
             timestamp: (Time.now.to_f * 1000).to_i
       }))
@@ -114,19 +115,6 @@ module Logdna
       false
     end
 
-<<<<<<< HEAD
-    def close
-      if !@client.nil?
-        @client.exitout
-      end
-    end
-
-    at_exit do
-      if defined? @@client and !@@client.nil?
-          #@@client.exitout()
-      end
-    end
-=======
 
     # def close
     #   if defined? @@client and !@@client.nil?
@@ -139,6 +127,5 @@ module Logdna
     #       @@client.exitout()
     #   end
     # end
->>>>>>> savingBranch
   end
 end
