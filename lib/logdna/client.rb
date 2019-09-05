@@ -36,7 +36,7 @@ module Logdna
         level: opts[:level],
         env: opts[:env],
         meta: opts[:meta],
-        timestamp: Time.now.to_i,
+        timestamp: Time.now.to_i
       }
       processedMessage.delete(:meta) if processedMessage[:meta].nil?
       processedMessage

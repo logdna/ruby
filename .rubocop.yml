@@ -5,7 +5,11 @@ Metrics/LineLength:
 # Too short methods lead to extraction of single-use methods, which can make
 # the code easier to read (by naming things), but can also clutter the class
 Metrics/MethodLength:
+<<<<<<< HEAD
   Max: 100
+=======
+  Max: 40
+>>>>>>> add rubycop config file and run it
 
 # The guiding principle of classes is SRP, SRP can't be accurately measured by LoC
 Metrics/ClassLength:
@@ -22,10 +26,18 @@ Metrics/PerceivedComplexity:
 
 # No space makes the method definition shorter and differentiates
 # from a regular assignment.
+<<<<<<< HEAD
 
 Layout/AccessModifierIndentation:
   Enabled: true
   IndentationWidth: 4
+=======
+Style/Layout:
+  EnforcedStyle: no_space
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+  SpaceBeforeBlockParameters: false
+>>>>>>> add rubycop config file and run it
 
 # Single quotes being faster is hardly measurable and only affects parse time.
 # Enforcing double quotes reduces the times where you need to change them
