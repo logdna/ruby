@@ -24,7 +24,7 @@ module Logdna
       @exception_flag = false
 
       @request = request
-      @retry_timeout = opts[:retry_timeout] ||= Resources::RETRY_TIMEOUT
+      @retry_timeout = opts[:retry_timeout] ? opts[:retry_timeout] : Resources::RETRY_TIMEOUT
     end
 
     def process_message(msg, opts = {})
