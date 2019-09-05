@@ -23,8 +23,7 @@ module Logdna
       @exception_flag = false
 
       @request = request
-      @timer_task = false
-      @backoff_interval = opts[:backoff_period] ||= Resources::BACKOFF_PERIOD
+      @retry_timeout = opts[:retry_timeout] ? opts[:retry_timeout] : Resources::RETRY_TIMEOUT
     end
 
     def process_message(msg, opts={})
