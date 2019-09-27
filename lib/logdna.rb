@@ -127,7 +127,7 @@ module Logdna
 
     def close
       if defined? @client and !@client.nil?
-          @client.exitout()
+          @client.exitout
       end
     end
   end
