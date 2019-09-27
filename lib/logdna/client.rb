@@ -34,7 +34,7 @@ module Logdna
         level: opts[:level],
         env: opts[:env],
         meta: opts[:meta],
-        timestamp: Time.now.to_i
+        timestamp: Time.now.to_i,
       }
       processed_message.delete(:meta) if processed_message[:meta].nil?
       processed_message
@@ -112,7 +112,7 @@ module Logdna
 
     def flush
       @flush_scheduled = false
-      return if @buffer.empty?
+      return if @buffer.empty? && @side_messages.empty?
 
       if @lock.try_lock
         send_request
@@ -122,7 +122,7 @@ module Logdna
     end
 
     def exitout
-      flush if @buffer.any?
+      flush if @buffer.any? || @side_messages.any?
       puts "Exiting LogDNA logger: Logging remaining messages"
       nil
     end

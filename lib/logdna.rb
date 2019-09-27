@@ -23,19 +23,22 @@ module Logdna
 
       endpoint = opts[:endpoint] || Resources::ENDPOINT
       hostname = opts[:hostname] || Socket.gethostname
+
+      if (hostname.size > Resources::MAX_INPUT_LENGTH || @app.size > Resources::MAX_INPUT_LENGTH )
+        puts "Hostname or Appname is over #{Resources::MAX_INPUT_LENGTH} characters"
+        return
+      end
+
       ip =  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : ''
       mac = opts.key?(:mac) ? "&mac=#{opts[:mac]}" : ''
       url = "#{endpoint}?hostname=#{hostname}#{mac}#{ip}"
       uri = URI(url)
 
-      if (hostname.size > Resources::MAX_INPUT_LENGTH || @app.size > Resources::MAX_INPUT_LENGTH )
-        puts "Hostname or Appname is over #{Resources::MAX_INPUT_LENGTH} characters"
-      end
 
       request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
       request.basic_auth('username', key)
 
-      @@client = Logdna::Client.new(request, uri, opts)
+      @client = Logdna::Client.new(request, uri, opts)
     end
 
     def default_opts
@@ -62,7 +65,7 @@ module Logdna
         return
       end
       message = message.to_s.encode("UTF-8")
-      @@client.write_to_buffer(message, default_opts.merge(opts).merge({
+      @client.write_to_buffer(message, default_opts.merge(opts).merge({
             timestamp: (Time.now.to_f * 1000).to_i
       }))
     end
@@ -109,6 +112,12 @@ module Logdna
     def datetime_format(*arg)
       puts "datetime_format not supported in LogDNA logger"
       return false
+    end
+
+    def close
+      if defined? @client and !@client.nil?
+          @client.exitout()
+      end
     end
   end
 end
