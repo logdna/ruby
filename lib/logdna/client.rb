@@ -112,12 +112,21 @@ module Logdna
       end
    end
 
-   def exitout
-      if @buffer.any?
-        flush()
+    def flush
+      @flush_scheduled = false
+      return if @buffer.empty? && @side_messages.empty?
+
+      if @lock.try_lock
+        send_request
+      else
+        schedule_flush
       end
-        puts "Exiting LogDNA logger: Logging remaining messages"
-      return
+    end
+
+    def exitout
+      flush if @buffer.any? || @side_messages.any?
+      puts "Exiting LogDNA logger: Logging remaining messages"
+      nil
     end
   end
 end
