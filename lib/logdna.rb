@@ -50,7 +50,7 @@ module Logdna
       }
     end
 
-    def level=(value)
+    def assign_level=(value)
       if value.is_a? Numeric
         @level = Resources::LOG_LEVELS[value]
         return
@@ -131,9 +131,11 @@ module Logdna
     end
 
     def close
-      if defined? @client and !@client.nil?
-          @client.exitout
-      end
+      @client.exitout if defined? @client && !@client.nil?
+    end
+
+    def at_exit
+      @client.exitout if defined? @client && !@client.nil?
     end
   end
 end
