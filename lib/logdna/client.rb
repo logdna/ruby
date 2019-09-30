@@ -18,13 +18,13 @@ module Logdna
       @side_messages = []
 
       @lock = Mutex.new
-      @flush_limit = opts[:flush_size] ? opts[:flush_size] : Resources::FLUSH_BYTE_LIMIT
-      @flush_interval = opts[:flush_interval] ? opts[:flush_interval] : Resources::FLUSH_INTERVAL
+      @flush_limit = opts[:flush_size] || Resources::FLUSH_BYTE_LIMIT
+      @flush_interval = opts[:flush_interval] || Resources::FLUSH_INTERVAL
       @flush_scheduled = false
       @exception_flag = false
 
       @request = request
-      @retry_timeout = opts[:retry_timeout] ? opts[:retry_timeout] : Resources::RETRY_TIMEOUT
+      @retry_timeout = opts[:retry_timeout] || Resources::RETRY_TIMEOUT
     end
 
     def process_message(msg, opts = {})
@@ -58,55 +58,55 @@ module Logdna
 
         @buffer_byte_size += new_message_size
         @buffer.push(processed_message)
-
-        @lock.unlock if @lock.locked?
-
-        flush if @flush_limit <= @buffer_byte_size
-
-        schedule_flush unless @flush_scheduled
       else
         @side_messages.push(process_message(msg, opts))
       end
+      @lock.unlock if @lock.locked?
+
+      flush if @flush_limit <= @buffer_byte_size
+      schedule_flush unless @flush_scheduled
     end
 
     def send_request
-      @request.body = {
-        e: "ls",
-        ls: @buffer.concat(@side_messages)
-      }.to_json
-      @side_messages.clear
+      if !@lock.try_lock
+        schedule_flush
+      else
+        @request.body = {
+          e: "ls",
+          ls: @buffer.concat(@side_messages)
+        }.to_json
+        @side_messages.clear
+        begin
+          @response = Net::HTTP.start(
+            @uri.hostname,
+            @uri.port,
+            use_ssl: @uri.scheme == "https"
+          ) do |http|
+            http.request(@request)
+          end
 
-      begin
-        @response = Net::HTTP.start(
-          @uri.hostname,
-          @uri.port,
-          use_ssl: @uri.scheme == "https"
-        ) do |http|
-          http.request(@request)
+          if @response.is_a?(Net::HTTPForbidden)
+            puts "Please provide a valid ingestion key"
+          elsif !@response.is_a?(Net::HTTPSuccess)
+            puts "The response is not successful "
+          end
+          @exception_flag = false
+        rescue SocketError
+          print "Network connectivity issue"
+          @exception_flag = true
+          @side_messages.concat(@buffer)
+        rescue Errno::ECONNREFUSED => e
+          print "The server is down. #{e.message}"
+          @exception_flag = true
+          @side_messages.concat(@buffer)
+        rescue Timeout::Error => e
+          print "Timeout error occurred. #{e.message}"
+          @exception_flag = true
+          @side_messages.concat(@buffer)
+        ensure
+          @buffer.clear
+          @lock.unlock if @lock.locked?
         end
-
-        if @response.is_a?(Net::HTTPForbidden)
-          puts "Please provide a valid ingestion key"
-        elsif !@response.is_a?(Net::HTTPSuccess)
-          puts "The response is not successful "
-        end
-
-        @exception_flag = false
-      rescue SocketError
-        puts "Network connectivity issue"
-        @exception_flag = true
-        @side_messages.concat(@buffer)
-      rescue Errno::ECONNREFUSED => e
-        puts "The server is down. #{e.message}"
-        @exception_flag = true
-        @side_messages.concat(@buffer)
-      rescue Timeout::Error => e
-        puts "Timeout error occurred. #{e.message}"
-        @exception_flag = true
-        @side_messages.concat(@buffer)
-      ensure
-        @buffer.clear
-        @lock.unlock if @lock.locked?
       end
     end
 
@@ -114,11 +114,7 @@ module Logdna
       @flush_scheduled = false
       return if @buffer.empty? && @side_messages.empty?
 
-      if @lock.try_lock
-        send_request
-      else
-        schedule_flush
-      end
+      send_request
     end
 
     def exitout
