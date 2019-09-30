@@ -82,6 +82,13 @@ module Logdna
           ls: @buffer.concat(@side_messages)
         }.to_json
         @side_messages.clear
+
+        handleExcpetion = lambda(message) do
+          puts message
+          @exception_flag = true
+          @side_messages.concat(@buffer)
+        end
+
         begin
           @response = Net::HTTP.start(
             @uri.hostname,
@@ -98,17 +105,11 @@ module Logdna
           end
           @exception_flag = false
         rescue SocketError
-          print "Network connectivity issue"
-          @exception_flag = true
-          @side_messages.concat(@buffer)
+          handleExcpetion.call("Network connectivity issue")
         rescue Errno::ECONNREFUSED => e
-          print "The server is down. #{e.message}"
-          @exception_flag = true
-          @side_messages.concat(@buffer)
+          handleExcpetion.call("The server is down. #{e.message}")
         rescue Timeout::Error => e
-          print "Timeout error occurred. #{e.message}"
-          @exception_flag = true
-          @side_messages.concat(@buffer)
+          handleExcpetion.call("Timeout error occurred. #{e.message}")
         ensure
           @buffer.clear
           @lock.unlock if @lock.locked?
