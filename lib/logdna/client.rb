@@ -17,13 +17,13 @@ module Logdna
       @side_messages = []
 
       @lock = Mutex.new
-      @flush_limit = opts[:flush_size] ? opts[:flush_size] : Resources::FLUSH_BYTE_LIMIT
-      @flush_interval = opts[:flush_interval] ? opts[:flush_interval] : Resources::FLUSH_INTERVAL
+      @flush_limit = opts[:flush_size] || Resources::FLUSH_BYTE_LIMIT
+      @flush_interval = opts[:flush_interval] || Resources::FLUSH_INTERVAL
       @flush_scheduled = false
       @exception_flag = false
 
       @request = request
-      @retry_timeout = opts[:retry_timeout] ? opts[:retry_timeout] : Resources::RETRY_TIMEOUT
+      @retry_timeout = opts[:retry_timeout] || Resources::RETRY_TIMEOUT
     end
 
     def process_message(msg, opts={})
@@ -58,56 +58,60 @@ module Logdna
 
     def write_to_buffer(msg, opts)
       if @lock.try_lock
-          if !@side_messages.empty?
-            @buffer.concat(@side_messages)
-          end
-          processed_message = process_message(msg, opts)
-          new_message_size = processed_message.to_s.bytesize
-          @buffer_byte_size += new_message_size
+        @buffer.concat(@side_messages) unless @side_messages.empty?
+        processed_message = process_message(msg, opts)
+        new_message_size = processed_message.to_s.bytesize
 
-          if @flush_limit > (new_message_size + @buffer_byte_size)
-             @buffer.push(processed_message)
-          else
-             @buffer.push(processed_message)
-             self.flush
-          end
-
-          begin
-            @lock.unlock
-          rescue
-            puts 'Nothing was locked'
-          end
-          schedule_flush()
+        @buffer_byte_size += new_message_size
+        @buffer.push(processed_message)
       else
           @side_messages.push(process_message(msg, opts))
       end
+      @lock.unlock if @lock.locked?
 
-    def flush
-      return if @buffer.empty?
-      if @lock.try_lock
+      flush if @flush_limit <= @buffer_byte_size
+      schedule_flush unless @flush_scheduled
+    end
+
+    def send_request
+      if !@lock.try_lock
+        schedule_flush
+      else
         @request.body = {
-          e: 'ls',
-          ls: @buffer.concat(@side_messages),
+          e: "ls",
+          ls: @buffer.concat(@side_messages)
         }.to_json
-        @timer_task = false
         @side_messages.clear
-
         begin
-          @response = Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
+          @response = Net::HTTP.start(
+            @uri.hostname,
+            @uri.port,
+            use_ssl: @uri.scheme == "https"
+          ) do |http|
             http.request(@request)
           end
+
+          if @response.is_a?(Net::HTTPForbidden)
+            puts "Please provide a valid ingestion key"
+          elsif !@response.is_a?(Net::HTTPSuccess)
+            puts "The response is not successful "
+          end
           @exception_flag = false
-        rescue
-          puts `Error at the attempt to send the request #{@response.body if @response}`
+        rescue SocketError
+          print "Network connectivity issue"
           @exception_flag = true
           @side_messages.concat(@buffer)
-        end
-        @buffer.clear
-
-        begin
-          @lock.unlock
-        rescue
-          puts 'Nothing was locked'
+        rescue Errno::ECONNREFUSED => e
+          print "The server is down. #{e.message}"
+          @exception_flag = true
+          @side_messages.concat(@buffer)
+        rescue Timeout::Error => e
+          print "Timeout error occurred. #{e.message}"
+          @exception_flag = true
+          @side_messages.concat(@buffer)
+        ensure
+          @buffer.clear
+          @lock.unlock if @lock.locked?
         end
       end
    end
@@ -116,11 +120,7 @@ module Logdna
       @flush_scheduled = false
       return if @buffer.empty? && @side_messages.empty?
 
-      if @lock.try_lock
-        send_request
-      else
-        schedule_flush
-      end
+      send_request
     end
 
     def exitout

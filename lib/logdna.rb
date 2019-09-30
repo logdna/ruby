@@ -6,7 +6,6 @@ require "socket"
 require "uri"
 require_relative "logdna/client.rb"
 require_relative "logdna/resources.rb"
-require_relative "logdna/version.rb"
 module Logdna
   class ValidURLRequired < ArgumentError; end
   class MaxLengthExceeded < ArgumentError; end
@@ -26,19 +25,18 @@ module Logdna
       endpoint = opts[:endpoint] || Resources::ENDPOINT
       hostname = opts[:hostname] || Socket.gethostname
 
-      if (hostname.size > Resources::MAX_INPUT_LENGTH || @app.size > Resources::MAX_INPUT_LENGTH )
+      if hostname.size > Resources::MAX_INPUT_LENGTH || @app.size > Resources::MAX_INPUT_LENGTH
         puts "Hostname or Appname is over #{Resources::MAX_INPUT_LENGTH} characters"
         return
       end
 
-      ip =  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : ''
-      mac = opts.key?(:mac) ? "&mac=#{opts[:mac]}" : ''
+      ip =  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : ""
+      mac = opts.key?(:mac) ? "&mac=#{opts[:mac]}" : ""
       url = "#{endpoint}?hostname=#{hostname}#{mac}#{ip}"
       uri = URI(url)
 
-
-      request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
-      request.basic_auth 'username', key
+      request = Net::HTTP::Post.new(uri.request_uri, "Content-Type" => "application/json")
+      request.basic_auth("username", key)
 
       @client = Logdna::Client.new(request, uri, opts)
     end
@@ -52,7 +50,7 @@ module Logdna
       }
     end
 
-    def level=(value)
+    def assign_level=(value)
       if value.is_a? Numeric
         @level = Resources::LOG_LEVELS[value]
         return
@@ -61,30 +59,30 @@ module Logdna
       @level = value
     end
 
-    def log(message, opts={})
-      if(message.length == 0)
+    def log(message, opts = {})
+      if message.empty?
         puts "Your logline cannot be empty"
         return
       end
       message = message.to_s.encode("UTF-8")
-      @client.write_to_buffer(message, default_opts.merge(opts).merge({
-            timestamp: (Time.now.to_f * 1000).to_i
-      }))
+      @client.write_to_buffer(message, default_opts.merge(opts).merge(
+                                         timestamp: (Time.now.to_f * 1000).to_i
+                                       ))
     end
 
     Resources::LOG_LEVELS.each do |lvl|
       name = lvl.downcase
 
       define_method name do |msg = nil, opts = {}, &block|
-        self.log(msg, opts.merge(
-                        level: lvl
-                      ), &block)
+        log(msg, opts.merge(
+                   level: lvl
+                 ), &block)
       end
 
       define_method "#{name}?" do
-        return Resources::LOG_LEVELS[self.level] == lvl if level.is_a? Numeric
+        return Resources::LOG_LEVELS[level] == lvl if level.is_a? Numeric
 
-        self.level == lvl
+        assign_level == lvl
       end
     end
 
@@ -95,10 +93,10 @@ module Logdna
       @meta = nil
     end
 
-    def <<(msg=nil, opts={})
-      self.log(msg, opts.merge({
-        level: '',
-      }))
+    def <<(msg = nil, opts = {})
+      log(msg, opts.merge(
+                 level: ""
+               ))
     end
 
     def add(*_arg)
@@ -118,9 +116,11 @@ module Logdna
     end
 
     def close
-      if defined? @client and !@client.nil?
-          @client.exitout
-      end
+      @client.exitout if defined? @client && !@client.nil?
+    end
+
+    def at_exit
+      @client.exitout if defined? @client && !@client.nil?
     end
   end
 end
