@@ -103,7 +103,6 @@ module Logdna
           @side_messages.concat(@buffer)
         ensure
           @buffer.clear
-          @lock.unlock if @lock.locked? && @lock.owned?
         end
       end
 
