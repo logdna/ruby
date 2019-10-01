@@ -17,6 +17,7 @@ module Logdna
       @side_messages = []
 
       @lock = Mutex.new
+      @side_message_lock = Mutex.new
       @flush_limit = opts[:flush_size] || Resources::FLUSH_BYTE_LIMIT
       @flush_interval = opts[:flush_interval] || Resources::FLUSH_INTERVAL
       @flush_scheduled = false
@@ -48,45 +49,49 @@ module Logdna
     end
 
     def schedule_flush
-      def start_timer
-        sleep(@exception_flag ? @backoff_period : @flush_interval)
-        flush
-      end
-      thread = Thread.new{ start_timer }
+      @flush_scheduled = true
+      start_timer = lambda {
+        sleep(@exception_flag ? @retry_timeout : @flush_interval)
+        flush if @flush_scheduled
+      }
+      thread = Thread.new { start_timer }
       thread.join
     end
 
     def write_to_buffer(msg, opts)
       if @lock.try_lock
-        @buffer.concat(@side_messages) unless @side_messages.empty?
         processed_message = process_message(msg, opts)
         new_message_size = processed_message.to_s.bytesize
-
-        @buffer_byte_size += new_message_size
         @buffer.push(processed_message)
-      else
-          @side_messages.push(process_message(msg, opts))
-      end
-      @lock.unlock if @lock.locked? && @lock.owned?
+        @buffer_byte_size += new_message_size
+        @lock.unlock
 
-      flush if @flush_limit <= @buffer_byte_size
-      schedule_flush unless @flush_scheduled
+        flush if @flush_limit <= @buffer_byte_size
+        schedule_flush unless @flush_scheduled
+      else
+        @side_message_lock.synchronize do
+          @side_messages.push(process_message(msg, opts))
+        end
+      end
     end
 
     def send_request
-      if !@lock.try_lock
-        schedule_flush
-      else
+        @side_message_lock.synchronize do
+          @buffer.concat(@side_messages)
+          @side_messages.clear
+        end
+
         @request.body = {
           e: "ls",
-          ls: @buffer.concat(@side_messages)
+          ls: @buffer
         }.to_json
-        @side_messages.clear
 
         handleExcpetion = lambda do |message|
           puts message
           @exception_flag = true
-          @side_messages.concat(@buffer)
+          @side_message_lock.synchronize do
+            @side_messages.concat(@buffer)
+          end
         end
 
         begin
@@ -97,7 +102,6 @@ module Logdna
           ) do |http|
             http.request(@request)
           end
-          
           if @response.is_a?(Net::HTTPForbidden)
             puts "Please provide a valid ingestion key"
           elsif !@response.is_a?(Net::HTTPSuccess)
@@ -112,16 +116,18 @@ module Logdna
           handleExcpetion.call("Timeout error occurred. #{e.message}")
         ensure
           @buffer.clear
-          @lock.unlock if @lock.locked? && @lock.owned?
         end
-      end
-   end
+    end
 
     def flush
       @flush_scheduled = false
-      return if @buffer.empty? && @side_messages.empty?
-
-      send_request
+      if @lock.try_lock
+        return if @buffer.empty? && @side_messages.empty?
+        send_request
+        @lock.unlock
+      else
+        schedule_flush
+      end
     end
 
     def exitout
