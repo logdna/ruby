@@ -69,53 +69,54 @@ module Logdna
     end
 
     def send_request
+      @side_message_lock.synchronize do
+        @buffer.concat(@side_messages)
+        @side_messages.clear
+      end
+
+      @request.body = {
+        e: "ls",
+        ls: @buffer
+      }.to_json
+
+      handle_excpetion = lambda do |message|
+        puts message
+        @exception_flag = true
         @side_message_lock.synchronize do
-          @buffer.concat(@side_messages)
-          @side_messages.clear
+          @side_messages.concat(@buffer)
         end
+      end
 
-        @request.body = {
-          e: "ls",
-          ls: @buffer
-        }.to_json
-
-        handleExcpetion = lambda do |message|
-          puts message
-          @exception_flag = true
-          @side_message_lock.synchronize do
-            @side_messages.concat(@buffer)
-          end
+      begin
+        @response = Net::HTTP.start(
+          @uri.hostname,
+          @uri.port,
+          use_ssl: @uri.scheme == "https"
+        ) do |http|
+          http.request(@request)
         end
-
-        begin
-          @response = Net::HTTP.start(
-            @uri.hostname,
-            @uri.port,
-            use_ssl: @uri.scheme == "https"
-          ) do |http|
-            http.request(@request)
-          end
-          if @response.is_a?(Net::HTTPForbidden)
-            puts "Please provide a valid ingestion key"
-          elsif !@response.is_a?(Net::HTTPSuccess)
-            puts "The response is not successful "
-          end
-          @exception_flag = false
-        rescue SocketError
-          handleExcpetion.call("Network connectivity issue")
-        rescue Errno::ECONNREFUSED => e
-          handleExcpetion.call("The server is down. #{e.message}")
-        rescue Timeout::Error => e
-          handleExcpetion.call("Timeout error occurred. #{e.message}")
-        ensure
-          @buffer.clear
+        if @response.is_a?(Net::HTTPForbidden)
+          puts "Please provide a valid ingestion key"
+        elsif !@response.is_a?(Net::HTTPSuccess)
+          puts "The response is not successful "
         end
+        @exception_flag = false
+      rescue SocketError
+        handle_excpetion.call("Network connectivity issue")
+      rescue Errno::ECONNREFUSED => e
+        handle_excpetion.call("The server is down. #{e.message}")
+      rescue Timeout::Error => e
+        handle_excpetion.call("Timeout error occurred. #{e.message}")
+      ensure
+        @buffer.clear
+      end
     end
 
     def flush
       @flush_scheduled = false
       if @lock.try_lock
         return if @buffer.empty? && @side_messages.empty?
+
         send_request
         @lock.unlock
       else
