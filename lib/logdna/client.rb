@@ -67,7 +67,7 @@ module Logdna
       else
           @side_messages.push(process_message(msg, opts))
       end
-      @lock.unlock if @lock.locked?
+      @lock.unlock if @lock.locked? && @lock.owned?
 
       flush if @flush_limit <= @buffer_byte_size
       schedule_flush unless @flush_scheduled
@@ -83,7 +83,7 @@ module Logdna
         }.to_json
         @side_messages.clear
 
-        handleExcpetion = lambda(message) do
+        handleExcpetion = lambda do |message|
           puts message
           @exception_flag = true
           @side_messages.concat(@buffer)
@@ -97,7 +97,7 @@ module Logdna
           ) do |http|
             http.request(@request)
           end
-
+          
           if @response.is_a?(Net::HTTPForbidden)
             puts "Please provide a valid ingestion key"
           elsif !@response.is_a?(Net::HTTPSuccess)
@@ -112,7 +112,7 @@ module Logdna
           handleExcpetion.call("Timeout error occurred. #{e.message}")
         ensure
           @buffer.clear
-          @lock.unlock if @lock.locked?
+          @lock.unlock if @lock.locked? && @lock.owned?
         end
       end
    end
