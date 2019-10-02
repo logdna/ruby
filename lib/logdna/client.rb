@@ -125,7 +125,7 @@ module Logdna
     end
 
     def exitout
-      flush if @buffer.any? || @side_messages.any?
+      flush
       puts "Exiting LogDNA logger: Logging remaining messages"
     end
   end
