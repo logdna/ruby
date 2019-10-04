@@ -35,7 +35,8 @@ module Logdna
       end
 
       request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
-      request['user-agent'] = "ruby/#{LogDNA::VERSION} (#{RUBY_PLATFORM.split('-').last})"
+      pkg_version = opts[:rails_logdna_v] ? opts[:rails_logdna_v] : "ruby/#{LogDNA::VERSION}"
+      request['user-agent'] = "#{pkg_version} (#{RUBY_PLATFORM.split('-').last})"
       request.basic_auth 'username', key
 
       @@client = Logdna::Client.new(request, uri, opts)
