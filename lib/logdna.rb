@@ -33,7 +33,7 @@ module Logdna
       if (hostname.size > Resources::MAX_INPUT_LENGTH || @app.size > Resources::MAX_INPUT_LENGTH )
         puts "Hostname or Appname is over #{Resources::MAX_INPUT_LENGTH} characters"
       end
-
+      p opts
       request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
       pkg_version = opts[:rails_logdna_v] ? opts[:rails_logdna_v] : "ruby/#{LogDNA::VERSION}"
       request['user-agent'] = "#{pkg_version}"
