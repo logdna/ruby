@@ -42,7 +42,6 @@ module Logdna
     end
 
     def schedule_flush
-      @flush_scheduled = true
       start_timer = lambda {
         sleep(@exception_flag ? @retry_timeout : @flush_interval)
         flush if @flush_scheduled
@@ -57,6 +56,7 @@ module Logdna
         new_message_size = processed_message.to_s.bytesize
         @buffer.push(processed_message)
         @buffer_byte_size += new_message_size
+        @flush_scheduled = true
         @lock.unlock
 
         flush if @flush_limit <= @buffer_byte_size
@@ -107,6 +107,8 @@ module Logdna
         handle_excpetion.call("The server is down. #{e.message}")
       rescue Timeout::Error => e
         handle_excpetion.call("Timeout error occurred. #{e.message}")
+      rescue
+        handle_excpetion.call("#{e.message}")
       ensure
         @buffer.clear
       end
