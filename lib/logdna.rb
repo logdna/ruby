@@ -50,7 +50,7 @@ module Logdna
       }
     end
 
-    def assign_level=(value)
+    def level=(value)
       if value.is_a? Numeric
         @level = Resources::LOG_LEVELS[value]
         return
@@ -59,15 +59,15 @@ module Logdna
       @level = value
     end
 
-    def log(message, opts = {})
-      if message.empty?
-        puts "Your logline cannot be empty"
-        return
+    def log(message = nil, opts = {})
+      yield if block_given? && message == nil
+
+      if message != nil && !message.empty?
+        message = message.to_s.encode("UTF-8")
+        @client.write_to_buffer(message, default_opts.merge(opts).merge(
+          timestamp: (Time.now.to_f * 1000).to_i
+          ))
       end
-      message = message.to_s.encode("UTF-8")
-      @client.write_to_buffer(message, default_opts.merge(opts).merge(
-                                         timestamp: (Time.now.to_f * 1000).to_i
-                                       ))
     end
 
     Resources::LOG_LEVELS.each do |lvl|
