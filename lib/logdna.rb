@@ -49,7 +49,7 @@ module Logdna
       begin
         request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
         request.basic_auth 'username', key
-        request['user-agent'] = opts[:rails_logdna_v] || "ruby/#{LogDNA::VERSION}"
+        request['user-agent'] = opts['user-agent'] || "ruby/#{LogDNA::VERSION}"
       rescue => e
         handle_exception(e)
         return
