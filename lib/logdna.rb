@@ -64,8 +64,8 @@ module Logdna
 
       message = message.to_s.encode("UTF-8")
       @client.write_to_buffer(message, default_opts.merge(opts).merge(
-        timestamp: (Time.now.to_f * 1000).to_i
-        ))
+                                         timestamp: (Time.now.to_f * 1000).to_i
+                                       ))
     end
 
     Resources::LOG_LEVELS.each do |lvl|
@@ -73,8 +73,8 @@ module Logdna
 
       define_method name do |msg = nil, opts = {}|
         self.log(msg, opts.merge(
-                   level: lvl
-                 ))
+                        level: lvl
+                      ))
       end
 
       define_method "#{name}?" do
