@@ -60,29 +60,27 @@ module Logdna
     end
 
     def log(message = nil, opts = {})
-      yield if block_given? && message == nil
+      return if message.nil? || message.empty?
 
-      if message != nil && !message.empty?
-        message = message.to_s.encode("UTF-8")
-        @client.write_to_buffer(message, default_opts.merge(opts).merge(
-          timestamp: (Time.now.to_f * 1000).to_i
-          ))
-      end
+      message = message.to_s.encode("UTF-8")
+      @client.write_to_buffer(message, default_opts.merge(opts).merge(
+        timestamp: (Time.now.to_f * 1000).to_i
+        ))
     end
 
     Resources::LOG_LEVELS.each do |lvl|
       name = lvl.downcase
 
-      define_method name do |msg = nil, opts = {}, &block|
-        log(msg, opts.merge(
+      define_method name do |msg = nil, opts = {}|
+        self.log(msg, opts.merge(
                    level: lvl
-                 ), &block)
+                 ))
       end
 
       define_method "#{name}?" do
         return Resources::LOG_LEVELS[level] == lvl if level.is_a? Numeric
 
-        assign_level == lvl
+        self.level == lvl
       end
     end
 
