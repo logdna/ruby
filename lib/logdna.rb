@@ -79,7 +79,11 @@ module Logdna
       define_method name do |msg = nil, opts = {}, &block|
         self.log(msg, opts.merge(
                         level: lvl
+<<<<<<< HEAD
                       ), &block)
+=======
+                      ))
+>>>>>>> rubocop
       end
 
       define_method "#{name}?" do
