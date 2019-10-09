@@ -1,9 +1,7 @@
 require 'require_all'
 require_all 'lib'
 
-
-options = {hostname: "new_ruby", meta:{:once => {:first => "nested1", :another => "nested2"}}}
-
+options = { hostname: "new_ruby", meta: { :once => { :first => "nested1", :another => "nested2" } } }
 
 logger1 = Logdna::Ruby.new('Your API Key', options)
 
@@ -14,21 +12,18 @@ logger1.warn('Warn message with Staging and Hello')
 logger1.clear
 logger1.log('Is everything back to normal?')
 
-
 logger1.log('Testing env app name change using log')
 logger1.env = 'PRODUCTION'
 logger1.app = 'CHANGED'
 logger1.log('This should be stage = PRODUCTION and appname = CHANGED')
 logger1.log('Testing env app name change using other messages')
 
-
-logger1.error('This is error message with env = DEVELOPMENT and appname = NIHAO', {:env => 'DEVELOPMENT', :app => 'NIHAO'})
+logger1.error('This is error message with env = DEVELOPMENT and appname = NIHAO', { :env => 'DEVELOPMENT', :app => 'NIHAO' })
 logger1.log('Should not stay as DEVELOPMENT and NIHAO')
 logger1.env = 'DEVELOPMENT'
 logger1.app = 'NIHAO'
 logger1.log('Now should be DEVELOPMENT and NIHAO')
-logger1.log('Logging metadata in trace level', {:meta => {:once => {:first => "nested1", :another => "nested2"}}, :level => "TRACE"})
-
+logger1.log('Logging metadata in trace level', { :meta => { :once => { :first => "nested1", :another => "nested2" } }, :level => "TRACE" })
 
 logger1.level = Logger::DEBUG
 logger1.log('This is debug message')
@@ -37,7 +32,6 @@ logger1.fatal('Does this continue as fatal?')
 logger1.log('This should be debug')
 logger1.level = Logger::WARN
 logger1.log('**************** This is the end of test ****************')
-
 
 =begin
 logger1.level = Logger::WARN
@@ -54,16 +48,9 @@ logger1.app = 'NEW APP NAME'
 logger1.env = 'Staging'
 logger1.level = 'INFO'
 
-
-
 logger1.level = 'INFO'
 logger1.level == Logger::INFO
-
 
 logger1.log('are changes all updated')
 =end
 sleep 3
-
-
-
-
