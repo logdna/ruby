@@ -60,7 +60,7 @@ module Logdna
     end
 
     def log(message = nil, opts = {})
-      if (message.nil? && block_given?)
+      if message.nil? && block_given?
         message = yield
       elsif message.nil?
         puts "provide either a message or block"
