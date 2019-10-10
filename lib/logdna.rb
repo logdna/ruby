@@ -60,8 +60,10 @@ module Logdna
     end
 
     def log(message = nil, opts = {})
-      if (message.nil?)
-        block_given? ? message = yield : return
+      if (message.nil? && block_given?)
+        message = yield
+      elsif message.nil?
+        puts "provide either a message or block"
       end
       message = message.to_s.encode("UTF-8")
       @client.write_to_buffer(message, default_opts.merge(opts).merge(
