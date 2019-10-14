@@ -21,7 +21,7 @@ module Logdna
       @env = opts[:env]
       @meta = opts[:meta]
       @@client = nil unless defined? @@client
-      
+
       endpoint = opts[:endpoint] || Resources::ENDPOINT
       hostname = opts[:hostname] || Socket.gethostname
       ip =  opts.key?(:ip) ? "&ip=#{opts[:ip]}" : ''
@@ -49,6 +49,7 @@ module Logdna
       begin
         request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
         request.basic_auth 'username', key
+        request[:'user-agent'] = opts[:'user-agent'] || "ruby/#{LogDNA::VERSION}"
       rescue => e
         handle_exception(e)
         return
