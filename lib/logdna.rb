@@ -21,6 +21,10 @@ module Logdna
       @level = opts[:level] || "INFO"
       @env = opts[:env]
       @meta = opts[:meta]
+<<<<<<< HEAD
+=======
+      @@client = nil unless defined? @@client
+>>>>>>> master
 
       endpoint = opts[:endpoint] || Resources::ENDPOINT
       hostname = opts[:hostname] || Socket.gethostname
@@ -37,7 +41,7 @@ module Logdna
 
       request = Net::HTTP::Post.new(uri.request_uri, "Content-Type" => "application/json")
       request.basic_auth("username", key)
-
+      request[:'user-agent'] = opts[:'user-agent'] || "ruby/#{LogDNA::VERSION}"
       @client = Logdna::Client.new(request, uri, opts)
     end
 
