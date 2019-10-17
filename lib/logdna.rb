@@ -62,7 +62,8 @@ module Logdna
     def log(message = nil, opts = {})
       if message.nil? && block_given?
         message = yield
-      elsif message.nil?
+      end
+      if message.nil?
         puts "provide either a message or block"
       end
       message = message.to_s.encode("UTF-8")
@@ -81,7 +82,7 @@ module Logdna
       end
 
       define_method "#{name}?" do
-        return Resources::LOG_LEVELS[level] == lvl if level.is_a? Numeric
+        return Resources::LOG_LEVELS[self.level] == lvl if level.is_a? Numeric
 
         self.level == lvl
       end
@@ -117,11 +118,15 @@ module Logdna
     end
 
     def close
-      @client.exitout if defined? @client && !@client.nil?
+      if defined?(@client and !@@client.nil?)
+        @client.exitout()
+      end
     end
 
     def at_exit
-      @client.exitout if defined? @client && !@client.nil?
+      if defined?(@client && !@client.nil?)
+        @client.exitout()
+      end
     end
   end
 end
