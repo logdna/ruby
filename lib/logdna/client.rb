@@ -86,7 +86,7 @@ module Logdna
         ls: @buffer
       }.to_json
 
-      handle_excpetion = lambda do |message|
+      handle_exception = lambda do |message|
         puts message
         @exception_flag = true
         @side_message_lock.synchronize do
@@ -105,17 +105,17 @@ module Logdna
         if @response.is_a?(Net::HTTPForbidden)
           puts "Please provide a valid ingestion key"
         elsif !@response.is_a?(Net::HTTPSuccess)
-          puts "The response is not successful "
+          handle_exception.call("The response is not successful ")
         end
         @exception_flag = false
       rescue SocketError
-        handle_excpetion.call("Network connectivity issue")
+        handle_exception.call("Network connectivity issue")
       rescue Errno::ECONNREFUSED => e
-        handle_excpetion.call("The server is down. #{e.message}")
+        handle_exception.call("The server is down. #{e.message}")
       rescue Timeout::Error => e
-        handle_excpetion.call("Timeout error occurred. #{e.message}")
+        handle_exception.call("Timeout error occurred. #{e.message}")
       rescue
-        handle_excpetion.call("#{e.message}")
+        handle_exception.call("#{e.message}")
       ensure
         @buffer.clear
       end
@@ -124,7 +124,10 @@ module Logdna
     def flush
       if @lock.try_lock
         @flush_scheduled = false
-        return if @buffer.empty? && @side_messages.empty?
+        if (@buffer.empty? && @side_messages.empty?)
+          @lock.unlock
+          return
+        end
 
         send_request
         @lock.unlock
