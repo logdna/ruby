@@ -21,11 +21,6 @@ module Logdna
       @level = opts[:level] || "INFO"
       @env = opts[:env]
       @meta = opts[:meta]
-<<<<<<< HEAD
-=======
-      @@client = nil unless defined? @@client
->>>>>>> master
-
       endpoint = opts[:endpoint] || Resources::ENDPOINT
       hostname = opts[:hostname] || Socket.gethostname
 
