@@ -6,6 +6,7 @@ require "socket"
 require "uri"
 require_relative "logdna/client.rb"
 require_relative "logdna/resources.rb"
+require_relative "logdna/version.rb"
 module Logdna
   class ValidURLRequired < ArgumentError; end
   class MaxLengthExceeded < ArgumentError; end
@@ -117,14 +118,14 @@ module Logdna
     end
 
     def close
-      if defined?(@client and !@@client.nil?)
-        @client.exitout()
+      if !@client.nil?
+        @client.exitout
       end
     end
 
-    at_exit
-      if defined?(@client && !@client.nil?)
-        @client.exitout()
+    at_exit do
+      if !@client.nil?
+        @client.exitout
       end
     end
   end
