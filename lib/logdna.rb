@@ -21,7 +21,10 @@ module Logdna
       @level = opts[:level] || "INFO"
       @env = opts[:env]
       @meta = opts[:meta]
+<<<<<<< HEAD
 
+=======
+>>>>>>> sdfsdf
       endpoint = opts[:endpoint] || Resources::ENDPOINT
       hostname = opts[:hostname] || Socket.gethostname
 

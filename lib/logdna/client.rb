@@ -124,7 +124,7 @@ module Logdna
     def flush
       if @lock.try_lock
         @flush_scheduled = false
-        if (@buffer.empty? && @side_messages.empty?)
+        if @buffer.empty? && @side_messages.empty?
           @lock.unlock
           return
         end
