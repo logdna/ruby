@@ -122,7 +122,7 @@ module Logdna
       end
     end
 
-    def at_exit
+    at_exit
       if defined?(@client && !@client.nil?)
         @client.exitout()
       end
