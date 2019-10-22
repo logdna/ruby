@@ -120,7 +120,6 @@ module Logdna
           handle_exception.call("The response is not successful #{@response}")
         end
         @exception_flag = false
-        p @response
       rescue SocketError
         handle_exception.call("Network connectivity issue")
       rescue Errno::ECONNREFUSED => e
