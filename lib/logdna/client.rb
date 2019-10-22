@@ -68,6 +68,7 @@ module Logdna
       end
     end
 
+    # This method has to be called with @lock
     def send_request
       @side_message_lock.synchronize do
         @buffer.concat(@side_messages)
@@ -101,6 +102,7 @@ module Logdna
           handle_exception.call("The response is not successful ")
         end
         @exception_flag = false
+        p @response
       rescue SocketError
         handle_exception.call("Network connectivity issue")
       rescue Errno::ECONNREFUSED => e
@@ -115,14 +117,12 @@ module Logdna
     end
 
     def flush
+
       if @lock.try_lock
         @flush_scheduled = false
-        if @buffer.empty? && @side_messages.empty?
-          @lock.unlock
-          return
+        if @buffer.any? || @side_messages.any?
+          send_request
         end
-
-        send_request
         @lock.unlock
       else
         schedule_flush

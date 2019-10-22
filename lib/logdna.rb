@@ -65,6 +65,7 @@ module Logdna
       end
       if message.nil?
         puts "provide either a message or block"
+        return
       end
       message = message.to_s.encode("UTF-8")
       @client.write_to_buffer(message, default_opts.merge(opts).merge(
