@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# require 'singleton'
+require 'logger'
 require "socket"
 require "uri"
 require_relative "logdna/client.rb"
@@ -22,11 +22,14 @@ module Logdna
       @level = opts[:level] || "INFO"
       @env = opts[:env]
       @meta = opts[:meta]
+      @internal_logger = Logger.new(STDOUT)
+      @internal_logger.level = Logger::DEBUG
+
       endpoint = opts[:endpoint] || Resources::ENDPOINT
       hostname = opts[:hostname] || Socket.gethostname
 
       if hostname.size > Resources::MAX_INPUT_LENGTH || @app.size > Resources::MAX_INPUT_LENGTH
-        puts "Hostname or Appname is over #{Resources::MAX_INPUT_LENGTH} characters"
+        @internal_logger.debug("Hostname or Appname is over #{Resources::MAX_INPUT_LENGTH} characters")
         return
       end
 
@@ -64,7 +67,7 @@ module Logdna
         message = yield
       end
       if message.nil?
-        puts "provide either a message or block"
+        @internal_logger.debug("provide either a message or block")
         return
       end
       message = message.to_s.encode("UTF-8")
@@ -103,7 +106,7 @@ module Logdna
     end
 
     def add(*_arg)
-      puts "add not supported in LogDNA logger"
+      @internal_logger.debug("add not supported in LogDNA logger")
       false
     end
 
@@ -114,7 +117,7 @@ module Logdna
     end
 
     def datetime_format(*_arg)
-      puts "datetime_format not supported in LogDNA logger"
+      @internal_logger.debug("datetime_format not supported in LogDNA logger")
       false
     end
 
