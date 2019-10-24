@@ -6,7 +6,6 @@ require "socket"
 require "uri"
 require_relative "logdna/client.rb"
 require_relative "logdna/resources.rb"
-require_relative "logdna/version.rb"
 module Logdna
   class ValidURLRequired < ArgumentError; end
   class MaxLengthExceeded < ArgumentError; end
@@ -22,10 +21,6 @@ module Logdna
       @level = opts[:level] || "INFO"
       @env = opts[:env]
       @meta = opts[:meta]
-<<<<<<< HEAD
-
-=======
->>>>>>> sdfsdf
       endpoint = opts[:endpoint] || Resources::ENDPOINT
       hostname = opts[:hostname] || Socket.gethostname
 
@@ -69,7 +64,6 @@ module Logdna
       end
       if message.nil?
         puts "provide either a message or block"
-        return
       end
       message = message.to_s.encode("UTF-8")
       @client.write_to_buffer(message, default_opts.merge(opts).merge(
@@ -123,14 +117,14 @@ module Logdna
     end
 
     def close
-      if !@client.nil?
-        @client.exitout
+      if defined?(@client and !@@client.nil?)
+        @client.exitout()
       end
     end
 
-    at_exit do
-      if !@client.nil?
-        @client.exitout
+    def at_exit
+      if defined?(@client && !@client.nil?)
+        @client.exitout()
       end
     end
   end
