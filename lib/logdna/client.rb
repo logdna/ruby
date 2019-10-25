@@ -63,6 +63,7 @@ module Logdna
         @lock.unlock
 
         flush if @flush_limit <= @buffer_byte_size
+
         schedule_flush unless @flush_scheduled
       else
         @side_message_lock.synchronize do
@@ -75,6 +76,7 @@ module Logdna
 
     # This method has to be called with @lock
     def send_request
+      puts "lll"
       @side_message_lock.synchronize do
         @buffer.concat(@side_messages)
         @side_messages.clear
