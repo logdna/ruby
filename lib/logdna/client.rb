@@ -108,8 +108,6 @@ module Logdna
         handle_exception.call("The server is down. #{e.message}")
       rescue Timeout::Error => e
         handle_exception.call("Timeout error occurred. #{e.message}")
-      rescue
-        handle_exception.call("#{e.message}")
       ensure
         @buffer.clear
       end
