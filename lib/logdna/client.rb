@@ -82,6 +82,7 @@ module Logdna
 
     # This method has to be called with @lock
     def send_request
+      puts "lll"
       @side_message_lock.synchronize do
         @buffer.concat(@side_messages)
         @side_messages.clear
