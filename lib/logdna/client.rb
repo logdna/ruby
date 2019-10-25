@@ -70,6 +70,7 @@ module Logdna
         @lock.unlock
 
         flush if @flush_limit <= @buffer_byte_size
+
         schedule_flush unless @flush_scheduled
       else
         @side_message_lock.synchronize do
@@ -80,6 +81,7 @@ module Logdna
 
     # This method has to be called with @lock
     def send_request
+      puts "lll"
       @side_message_lock.synchronize do
         @buffer.concat(@side_messages)
         @side_messages.clear
@@ -118,8 +120,6 @@ module Logdna
         handle_exception.call("The server is down. #{e.message}")
       rescue Timeout::Error => e
         handle_exception.call("Timeout error occurred. #{e.message}")
-      rescue
-        handle_exception.call("#{e.message}")
       ensure
         @buffer.clear
       end
