@@ -5,7 +5,6 @@ class TestServer
   attr_accessor :a
   def start_server(port)
     server = TCPServer.new(port)
-    puts server
     data = ""
 
     Thread.start(server.accept) { |client|
