@@ -4,7 +4,7 @@ require "minitest/autorun"
 
 require_relative "lib/logdna.rb"
 require_relative "lib/logdna/client.rb"
-require_relative "test-server.rb"
+require_relative "test_server.rb"
 
 class TestLogDNARuby < Minitest::Test
   @@log_line = "log line"
@@ -33,7 +33,7 @@ class TestLogDNARuby < Minitest::Test
 
     server_thread = Thread.start do
       server = TestServer.new
-      recieved_data = server.startServer(port)
+      recieved_data = server.start_server(port)
 
       assert_equal(recieved_data[:ls][0][:line], @@log_line)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
@@ -54,7 +54,7 @@ class TestLogDNARuby < Minitest::Test
 
     server_thread = Thread.start do
       sor = TestServer.new
-      recieved_data = sor.startServer(port)
+      recieved_data = sor.start_server(port)
 
       assert_equal(recieved_data[:ls][0][:line], @@log_line)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
@@ -75,7 +75,7 @@ class TestLogDNARuby < Minitest::Test
 
     server_thread = Thread.start do
       sor = TestServer.new
-      recieved_data = sor.startServer(port)
+      recieved_data = sor.start_server(port)
 
       assert_equal(recieved_data[:ls][0][:line], @@log_line)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
@@ -96,7 +96,7 @@ class TestLogDNARuby < Minitest::Test
 
     server_thread = Thread.start do
       sor = TestServer.new
-      recieved_data = sor.startServer(port)
+      recieved_data = sor.start_server(port)
 
       assert_equal(recieved_data[:ls][0][:line], @@log_line)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
@@ -120,7 +120,7 @@ class TestLogDNARuby < Minitest::Test
 
     server_thread = Thread.start do
       sor = TestServer.new
-      recieved_data = sor.startServerWithNotFound(port)
+      recieved_data = sor.return_not_found_res(port)
       # The order of recieved lines is unpredictable.
       recieved_lines = [
         recieved_data[:ls][0][:line],
