@@ -76,7 +76,6 @@ module Logdna
 
     # This method has to be called with @lock
     def send_request
-      puts "lll"
       @side_message_lock.synchronize do
         @buffer.concat(@side_messages)
         @side_messages.clear
@@ -112,7 +111,7 @@ module Logdna
         if @response.is_a?(Net::HTTPForbidden)
           @internal_logger.debug("Please provide a valid ingestion key")
         elsif !@response.is_a?(Net::HTTPSuccess)
-          handle_exception.call("The response is not successful ")
+          handle_exception.call("The response is not successful #{@response}")
         end
         @exception_flag = false
       rescue SocketError
