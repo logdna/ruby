@@ -66,8 +66,6 @@ Style/RescueStandardError:
 # is silly. Let's try to live without them for now.
 Style/ParenthesesAroundCondition:
   AllowSafeAssignment: false
-Lint/AssignmentInCondition:
-  AllowSafeAssignment: false
 
 # A specialized exception class will take one or more arguments and construct the message from it.
 # So both variants make sense.
@@ -110,6 +108,9 @@ Style/SingleLineBlockParams:
 Lint/ShadowingOuterLocalVariable:
   Enabled: false
 
+Lint/AssignmentInCondition:
+  Enabled: false
+
 # Check with yard instead.
 Style/Documentation:
   Enabled: false
@@ -123,6 +124,8 @@ Naming/BinaryOperatorParameterName:
 Lint/Debugger:
   Enabled: false
 
+Security/Eval:
+    Enabled: false
 # Style preference
 Style/MethodDefParentheses:
   Enabled: false
