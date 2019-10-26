@@ -1,7 +1,4 @@
-#!/usr/bin/env ruby
-# frozen_string_literal: true
-
-# require 'singleton'
+require 'logger'
 require "socket"
 require "uri"
 require_relative "logdna/client.rb"

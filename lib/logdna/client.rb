@@ -1,9 +1,8 @@
-require 'net/http'
-require 'socket'
-require 'json'
-require 'concurrent'
-require 'thread'
-require 'date'
+require "net/http"
+require "socket"
+require "json"
+require "concurrent"
+require "date"
 
 module Logdna
   class Client
