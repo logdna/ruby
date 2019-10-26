@@ -137,11 +137,14 @@ Style/TrailingCommaInHashLiteral:
 Style/IfUnlessModifier:
   Enabled: false
 
- Lint/DuplicateMethods:
+Lint/DuplicateMethods:
   Enabled: false
 
- Style/RedundantSelf:
+Style/RedundantSelf:
    Enabled: false
 
 Style/NegatedIf:
+  Enabled: false
+
+Style/SafeNavigation:
   Enabled: false

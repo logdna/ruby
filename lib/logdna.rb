@@ -79,8 +79,8 @@ module Logdna
 
       define_method name do |msg = nil, opts = {}, &block|
         self.log(msg, opts.merge(
-                   level: lvl
-                 ), &block)
+                        level: lvl
+                      ), &block)
       end
 
       define_method "#{name}?" do
@@ -120,6 +120,7 @@ module Logdna
     end
 
     def close
+<<<<<<< HEAD
       if defined?(@client and !@@client.nil?)
         @client.exitout()
       end
@@ -139,6 +140,13 @@ module Logdna
       if defined?(@client && !@client.nil?)
         @client.exitout()
       end
+=======
+      @client&.exitout
+    end
+
+    at_exit do
+      @client&.exitout
+>>>>>>> sss
     end
   end
 end
