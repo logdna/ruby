@@ -1,4 +1,6 @@
-require 'logger'
+# frozen_string_literal: true
+
+require "logger"
 require "socket"
 require "uri"
 require_relative "logdna/client.rb"
@@ -77,8 +79,8 @@ module Logdna
 
       define_method name do |msg = nil, opts = {}, &block|
         self.log(msg, opts.merge(
-                        level: lvl
-                      ), &block)
+                   level: lvl
+                 ), &block)
       end
 
       define_method "#{name}?" do

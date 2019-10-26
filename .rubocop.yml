@@ -133,3 +133,15 @@ Style/MethodDefParentheses:
 
 Style/TrailingCommaInHashLiteral:
   Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+ Lint/DuplicateMethods:
+  Enabled: false
+
+ Style/RedundantSelf:
+   Enabled: false
+
+Style/NegatedIf:
+  Enabled: false
