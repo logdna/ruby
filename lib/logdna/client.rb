@@ -68,8 +68,6 @@ module Logdna
           @side_messages.push(process_message(msg, opts))
         end
       end
-      timer_task.execute
-      timer_task
     end
 
     # This method has to be called with @lock
@@ -89,12 +87,6 @@ module Logdna
         @exception_flag = true
         @side_message_lock.synchronize do
           @side_messages.concat(@buffer)
-        rescue Timeout::Error => e
-          puts "Timeout error occurred. #{e.message}"
-          @exception_flag = true
-          @side_messages.concat(@buffer)
-        ensure
-          @buffer.clear
         end
       end
 
@@ -133,7 +125,7 @@ module Logdna
       else
         schedule_flush
       end
-   end
+    end
 
     def exitout
       flush

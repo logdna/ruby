@@ -129,16 +129,6 @@ module Logdna
         @client.exitout
       end
     end
-
-    def close
-      @client.exitout if defined? @client && !@client.nil?
-    end
-
-    def at_exit
-      if defined?(@client && !@client.nil?)
-        @client.exitout()
-      end
-    end
   end
 end
 

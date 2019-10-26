@@ -7,8 +7,6 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Max: 100
 
-
-
 # The guiding principle of classes is SRP, SRP can't be accurately measured by LoC
 Metrics/ClassLength:
   Max: 1500
@@ -24,6 +22,7 @@ Metrics/PerceivedComplexity:
 
 # No space makes the method definition shorter and differentiates
 # from a regular assignment.
+
 Layout/AccessModifierIndentation:
   Enabled: true
   IndentationWidth: 4
