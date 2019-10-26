@@ -9,5 +9,3 @@
 /tmp/
 *.gem
 .DS_Store
-/bin/
-package-lock.json
