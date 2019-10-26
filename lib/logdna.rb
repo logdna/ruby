@@ -49,7 +49,7 @@ module Logdna
       }
     end
 
-    def assign_level=(value)
+    def level=(value)
       if value.is_a? Numeric
         @level = Resources::LOG_LEVELS[value]
         return
@@ -140,12 +140,3 @@ module Logdna
     end
   end
 end
-
-
-# require 'socket'
-# puts "here?"
-# loop {
-#   msg = $stdin.gets
-#
-#   TCPSocket.open("localhost", 2000).puts(msg)
-# }
