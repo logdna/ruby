@@ -5,15 +5,9 @@ Metrics/LineLength:
 # Too short methods lead to extraction of single-use methods, which can make
 # the code easier to read (by naming things), but can also clutter the class
 Metrics/MethodLength:
-<<<<<<< HEAD
-<<<<<<< HEAD
   Max: 100
-=======
-  Max: 40
->>>>>>> add rubycop config file and run it
-=======
-  Max: 100
->>>>>>> change the locking logic ang change linting rules
+
+
 
 # The guiding principle of classes is SRP, SRP can't be accurately measured by LoC
 Metrics/ClassLength:
@@ -30,11 +24,6 @@ Metrics/PerceivedComplexity:
 
 # No space makes the method definition shorter and differentiates
 # from a regular assignment.
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> change the locking logic ang change linting rules
-
 Layout/AccessModifierIndentation:
   Enabled: true
   IndentationWidth: 4
