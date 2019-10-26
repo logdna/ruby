@@ -134,3 +134,12 @@ module Logdna
     end
   end
 end
+
+
+# require 'socket'
+# puts "here?"
+# loop {
+#   msg = $stdin.gets
+#
+#   TCPSocket.open("localhost", 2000).puts(msg)
+# }
