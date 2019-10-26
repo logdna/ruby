@@ -1,47 +1,35 @@
-require 'net/http'
-require 'socket'
-require 'json'
-require 'concurrent'
-require 'thread'
+# frozen_string_literal: true
+
+require "net/http"
+require "socket"
+require "json"
+require "concurrent"
+require "date"
 
 module Logdna
   class Client
-
     def initialize(request, uri, opts)
       @uri = uri
 
       # NOTE: buffer is in memory
-      @buffer = StringIO.new
-      @messages = []
-      @buffer_over_limit = false
+      @buffer = []
+      @buffer_byte_size = 0
 
-      @side_buffer = StringIO.new
       @side_messages = []
 
       @lock = Mutex.new
-      @task = nil
+      @side_message_lock = Mutex.new
+      @flush_limit = opts[:flush_size] || Resources::FLUSH_BYTE_LIMIT
+      @flush_interval = opts[:flush_interval] || Resources::FLUSH_INTERVAL
+      @flush_scheduled = false
+      @exception_flag = false
 
-      # NOTE: the byte limit only affects the message, not the entire message_hash
-      @actual_byte_limit = opts[:flushbyte] ||= Resources::FLUSH_BYTE_LIMIT
-      @actual_flush_interval = opts[:flushtime] ||= Resources::FLUSH_INTERVAL
-
-      @@request = request
+      @request = request
+      @retry_timeout = opts[:retry_timeout] || Resources::RETRY_TIMEOUT
     end
 
-    def encode_message(msg)
-      msg = msg.to_s unless msg.instance_of? String
-
-      begin
-          msg = msg.encode("UTF-8")
-      rescue Encoding::UndefinedConversionError => e
-        # NOTE: should this be raised or handled silently?
-        # raise e
-      end
-      msg
-    end
-
-    def message_hash(msg, opts={})
-      obj = {
+    def process_message(msg, opts = {})
+      processed_message = {
         line: msg,
         app: opts[:app],
         level: opts[:level],
@@ -49,116 +37,98 @@ module Logdna
         meta: opts[:meta],
         timestamp: Time.now.to_i,
       }
-      obj.delete(:meta) if obj[:meta].nil?
-      obj
+      processed_message.delete(:meta) if processed_message[:meta].nil?
+      processed_message
     end
 
-    def create_flush_task
-      return @task unless @task.nil? or !@task.running?
-
-      t = Concurrent::TimerTask.new(execution_interval: @actual_flush_interval, timeout_interval: Resources::TIMER_OUT) do |task|
-        if @messages.any?
-          # keep running if there are queued messages, but don't flush
-          # because the buffer is being flushed due to being over the limit
-          unless @buffer_over_limit
-            flush()
-          end
-        else
-          # no messages means we can kill the task
-          task.kill
-        end
-      end
-      t.execute
-    end
-
-    def check_side_buffer
-      return if @side_buffer.size == 0
-
-      @buffer.write(@side_buffer.string)
-      @side_buffer.truncate(0)
-      queued_side_messages = @side_messages
-      @side_messages = []
-      queued_side_messages.each { |message_hash_obj| @messages.push(message_hash_obj) }
-    end
-
-
-    # this should always be running synchronously within this thread
-    def buffer(msg, opts)
-      buffer_size = write_to_buffer(msg, opts)
-      unless buffer_size.nil?
-        process_buffer(buffer_size)
-      end
+    def schedule_flush
+      start_timer = lambda {
+        sleep(@exception_flag ? @retry_timeout : @flush_interval)
+        flush if @flush_scheduled
+      }
+      thread = Thread.new { start_timer }
+      thread.join
     end
 
     def write_to_buffer(msg, opts)
-      return if msg.nil?
-      msg = encode_message(msg)
+      if @lock.try_lock
+        processed_message = process_message(msg, opts)
+        new_message_size = processed_message.to_s.bytesize
+        @buffer.push(processed_message)
+        @buffer_byte_size += new_message_size
+        @flush_scheduled = true
+        @lock.unlock
 
-      if @lock.locked?
-        @side_buffer.write(msg)
-        @side_messages.push(message_hash(msg, opts))
-        return
-      end
-
-      check_side_buffer
-      buffer_size = @buffer.write(msg)
-      @messages.push(message_hash(msg, opts))
-      buffer_size
-    end
-
-    def queue_to_buffer(queue=@queue)
-      next_object = queue.shift
-      write_to_buffer(next_object[:msg], next_object[:opts])
-    end
-
-    def process_buffer(buffer_size)
-      if buffer_size > @actual_byte_limit
-        @buffer_over_limit = true
-        flush()
-        @buffer_over_limit = false
+        flush if @flush_limit <= @buffer_byte_size
+        schedule_flush unless @flush_scheduled
       else
-        @task = create_flush_task
-      end
-    end
-
-    # this should be running synchronously if @buffer_over_limit i.e. called from self.buffer
-    # else asynchronously through @task
-    def flush()
-      if defined? @@request and !@@request.nil?
-        request_messages = []
-        @lock.synchronize do
-          request_messages = @messages
-          @buffer.truncate(0)
-          @messages = []
-        end
-        return if request_messages.empty?
-
-        real = {
-          e: 'ls',
-          ls: request_messages,
-        }.to_json
-
-        @@request.body = real
-        @response = Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
-          http.request(@@request)
-        end
-
-        # don't kill @task if this was executed from self.buffer
-        # don't kill @task if there are queued messages
-        unless @buffer_over_limit || @messages.any? || @task.nil?
-          @task.shutdown
-          @task.kill
+        @side_message_lock.synchronize do
+          @side_messages.push(process_message(msg, opts))
         end
       end
     end
 
-    def exitout()
-      check_side_buffer
-      if @messages.any?
-        flush()
+    # This method has to be called with @lock
+    def send_request
+      @side_message_lock.synchronize do
+        @buffer.concat(@side_messages)
+        @side_messages.clear
       end
+
+      @request.body = {
+        e: "ls",
+        ls: @buffer
+      }.to_json
+
+      handle_exception = lambda do |message|
+        puts message
+        @exception_flag = true
+        @side_message_lock.synchronize do
+          @side_messages.concat(@buffer)
+        end
+      end
+
+      begin
+        @response = Net::HTTP.start(
+          @uri.hostname,
+          @uri.port,
+          use_ssl: @uri.scheme == "https"
+        ) do |http|
+          http.request(@request)
+        end
+        if @response.is_a?(Net::HTTPForbidden)
+          puts "Please provide a valid ingestion key"
+        elsif !@response.is_a?(Net::HTTPSuccess)
+          handle_exception.call("The response is not successful ")
+        end
+        @exception_flag = false
+      rescue SocketError
+        handle_exception.call("Network connectivity issue")
+      rescue Errno::ECONNREFUSED => e
+        handle_exception.call("The server is down. #{e.message}")
+      rescue Timeout::Error => e
+        handle_exception.call("Timeout error occurred. #{e.message}")
+      ensure
+        @buffer.clear
+      end
+    end
+
+    def flush
+
+      if @lock.try_lock
+        @flush_scheduled = false
+        if @buffer.any? || @side_messages.any?
+          send_request
+        end
+        @lock.unlock
+      else
+        schedule_flush
+      end
+    end
+
+    def exitout
+      flush
       puts "Exiting LogDNA logger: Logging remaining messages"
-      return
     end
   end
 end
