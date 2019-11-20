@@ -24,9 +24,7 @@ class TestLogDNARuby < Minitest::Test
     }
   end
 
-
-
-  def log_level_test(level, port, expectedLevel)
+  def log_level_test(level, port, expected_level)
     options = get_options(port)
     logdna_thread = Thread.start do
       logger = Logdna::Ruby.new("pp", options)
@@ -41,7 +39,7 @@ class TestLogDNARuby < Minitest::Test
       assert_equal(recieved_data[:ls][0][:line], LOG_LINE)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
       # assert_equal(recieved_data[:ls][0][:level], "WARN")
-      assert_equal(recieved_data[:ls][0][:level], expectedLevel)
+      assert_equal(recieved_data[:ls][0][:level], expected_level)
       assert_equal(recieved_data[:ls][0][:env], options[:env])
     end
 
@@ -50,7 +48,7 @@ class TestLogDNARuby < Minitest::Test
   end
 
   # Should retry to connect and preserve the failed line
-  def fatal_method_not_found(level, port, expectedLevel)
+  def fatal_method_not_found(level, port, expected_level)
     second_line = " second line"
     options = get_options(port)
     logdna_thread = Thread.start do
@@ -72,7 +70,7 @@ class TestLogDNARuby < Minitest::Test
       assert_includes(recieved_lines, second_line)
 
       assert_equal(recieved_data[:ls][0][:app], options[:app])
-      assert_equal(recieved_data[:ls][0][:level], expectedLevel)
+      assert_equal(recieved_data[:ls][0][:level], expected_level)
       assert_equal(recieved_data[:ls][0][:env], options[:env])
     end
 
@@ -81,10 +79,10 @@ class TestLogDNARuby < Minitest::Test
   end
 
   def test_all
-    log_level_test('warn', 2000, "WARN")
-    log_level_test('info', 2001, "INFO")
-    log_level_test('fatal', 2002, "FATAL")
-    log_level_test('debug', 2003, "DEBUG")
-    fatal_method_not_found('fatal', 2004, "FATAL")
+    log_level_test("warn", 2000, "WARN")
+    log_level_test("info", 2001, "INFO")
+    log_level_test("fatal", 2002, "FATAL")
+    log_level_test("debug", 2003, "DEBUG")
+    fatal_method_not_found("fatal", 2004, "FATAL")
   end
 end
