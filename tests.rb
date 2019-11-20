@@ -7,7 +7,7 @@ require_relative "lib/logdna/client.rb"
 require_relative "test_server.rb"
 
 class TestLogDNARuby < Minitest::Test
-  @@log_line = "log line"
+  LOG_LINE = "log line"
 
   def get_options(port)
     {
@@ -28,14 +28,14 @@ class TestLogDNARuby < Minitest::Test
     options = get_options(port)
     logdna_thread = Thread.start do
       logger = Logdna::Ruby.new("pp", options)
-      logger.warn(@@log_line)
+      logger.warn(LOG_LINE)
     end
 
     server_thread = Thread.start do
       server = TestServer.new
       recieved_data = server.start_server(port)
 
-      assert_equal(recieved_data[:ls][0][:line], @@log_line)
+      assert_equal(recieved_data[:ls][0][:line], LOG_LINE)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
       assert_equal(recieved_data[:ls][0][:level], "WARN")
       assert_equal(recieved_data[:ls][0][:env], options[:env])
@@ -49,14 +49,14 @@ class TestLogDNARuby < Minitest::Test
     options = get_options(port)
     logdna_thread = Thread.start do
       logger = Logdna::Ruby.new("pp", options)
-      logger.info(@@log_line)
+      logger.info(LOG_LINE)
     end
 
     server_thread = Thread.start do
       sor = TestServer.new
       recieved_data = sor.start_server(port)
 
-      assert_equal(recieved_data[:ls][0][:line], @@log_line)
+      assert_equal(recieved_data[:ls][0][:line], LOG_LINE)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
       assert_equal(recieved_data[:ls][0][:level], "INFO")
       assert_equal(recieved_data[:ls][0][:env], options[:env])
@@ -70,14 +70,14 @@ class TestLogDNARuby < Minitest::Test
     options = get_options(port)
     logdna_thread = Thread.start do
       logger = Logdna::Ruby.new("pp", options)
-      logger.debug(@@log_line)
+      logger.debug(LOG_LINE)
     end
 
     server_thread = Thread.start do
       sor = TestServer.new
       recieved_data = sor.start_server(port)
 
-      assert_equal(recieved_data[:ls][0][:line], @@log_line)
+      assert_equal(recieved_data[:ls][0][:line], LOG_LINE)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
       assert_equal(recieved_data[:ls][0][:level], "DEBUG")
       assert_equal(recieved_data[:ls][0][:env], options[:env])
@@ -91,14 +91,14 @@ class TestLogDNARuby < Minitest::Test
     options = get_options(port)
     logdna_thread = Thread.start do
       logger = Logdna::Ruby.new("pp", options)
-      logger.fatal(@@log_line)
+      logger.fatal(LOG_LINE)
     end
 
     server_thread = Thread.start do
       sor = TestServer.new
       recieved_data = sor.start_server(port)
 
-      assert_equal(recieved_data[:ls][0][:line], @@log_line)
+      assert_equal(recieved_data[:ls][0][:line], LOG_LINE)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
       assert_equal(recieved_data[:ls][0][:level], "FATAL")
       assert_equal(recieved_data[:ls][0][:env], options[:env])
@@ -114,7 +114,7 @@ class TestLogDNARuby < Minitest::Test
     options = get_options(port)
     logdna_thread = Thread.start do
       logger = Logdna::Ruby.new("pp", options)
-      logger.fatal(@@log_line)
+      logger.fatal(LOG_LINE)
       logger.fatal(second_line)
     end
 
@@ -127,7 +127,7 @@ class TestLogDNARuby < Minitest::Test
         recieved_data[:ls][1][:line]
       ]
 
-      assert_includes(recieved_lines, @@log_line)
+      assert_includes(recieved_lines, LOG_LINE)
       assert_includes(recieved_lines, second_line)
 
       assert_equal(recieved_data[:ls][0][:app], options[:app])

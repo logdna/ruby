@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "socket"
+
 class TestServer
   attr_accessor :a
   def start_server(port)
@@ -23,30 +24,28 @@ class TestServer
     eval(data)
   end
 
+  def accept_logs_and_respond(server, data, res)
+    Thread.start(server.accept) { |client|
+      headers = {}
+      while line = client.gets.split(" ", 2)
+        break if line[0] == ""
+
+        headers[line[0].chop] = line[1].strip
+      end
+      data = + client.read(headers["Content-Length"].to_i)
+      client.puts(res)
+      client.close
+    }.join
+
+    data
+  end
+
   def return_not_found_res(port)
     server = TCPServer.new(port)
-
-    count = 0
     data = ""
-    loop do
-      count += 1
-      Thread.start(server.accept) { |client|
-        headers = {}
-        while line = client.gets.split(" ", 2)
-          break if line[0] == ""
+    accept_logs_and_respond(server, data, "HTTP/1.1 404 Not Found")
+    data = +accept_logs_and_respond(server, data, "HTTP/1.1 200 OK")
 
-          headers[line[0].chop] = line[1].strip
-        end
-        data = + client.read(headers["Content-Length"].to_i)
-        if count < 2
-          client.puts("HTTP/1.1 404 Not Found")
-        else
-          client.puts("HTTP/1.1 200 OK")
-        end
-        client.close
-      }.join
-      break if count == 2
-    end
     eval(data)
-end
+  end
 end
