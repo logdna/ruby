@@ -35,10 +35,8 @@ class TestLogDNARuby < Minitest::Test
     server_thread = Thread.start do
       server = TestServer.new
       recieved_data = server.start_server(port)
-
       assert_equal(recieved_data[:ls][0][:line], LOG_LINE)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
-      # assert_equal(recieved_data[:ls][0][:level], "WARN")
       assert_equal(recieved_data[:ls][0][:level], expected_level)
       assert_equal(recieved_data[:ls][0][:env], options[:env])
     end
