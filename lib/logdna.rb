@@ -78,6 +78,7 @@ module Logdna
 
       define_method "#{name}?" do
         return Resources::LOG_LEVELS[level] == lvl if level.is_a? Numeric
+
         level == lvl
       end
     end
@@ -108,11 +109,11 @@ module Logdna
     end
 
     def close
-      @client.exitout unless @client.nil?
+      @client&.exitout
     end
 
     at_exit do
-      @client.exitout unless @client.nil?
+      @client&.exitout
     end
   end
 end
