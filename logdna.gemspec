@@ -1,12 +1,16 @@
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'logdna/version'
+
 Gem::Specification.new do |spec|
   spec.name          = "logdna"
-  spec.version       = "1.3.0".freeze
+  spec.version       = LogDNA::VERSION
   spec.authors       = "Gun Woo Choi, Derek Zhou, Vilya Levitskiy, Muaz Siddiqui"
   spec.email         = "support@logdna.com"
   spec.summary       = "LogDNA Ruby Logger"
   spec.homepage      = "https://github.com/logdna/ruby"
   spec.license       = "MIT"
-  spec.files         = ["**/*.rb", "Gemfile", "logdna.gemspec", "README.md", "LICENSE"]
+  spec.files         = `git ls-files -z`.split("\x0").select { |f| f.match(%r{(.md|.rb|.gemspec|Gemfile|LICENSE)$}) }
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
