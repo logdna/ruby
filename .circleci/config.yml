@@ -25,7 +25,7 @@ jobs:
       - run:
           name: Check Tagged Push
           command: |
-            PKG_VERSION=$(cat lib/logdna/version.rb | grep VERSION | cut -d'"' -f4)
+            PKG_VERSION=$(cat lib/logdna/version.rb | grep VERSION | cut -d'"' -f2)
             if [[ "${CIRCLE_TAG}" != "v${PKG_VERSION}" ]]; then
               echo "There is mismatch:"
               echo "  TAG_VERSION: ${CIRCLE_TAG}"
