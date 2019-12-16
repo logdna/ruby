@@ -1,4 +1,14 @@
-version: 2
+version: 2.1
+tagged_build_filters: &tagged_build_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /v[0-9]+\.[0-9]+\.[0-9]+/
+test_build_filters: &test_build_filters
+  branches:
+    only: /.*/
+  tags:
+    ignore: /v[0-9]+\.[0-9]+\.[0-9]+/
 jobs:
   test:
     docker:
@@ -32,35 +42,6 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - run:
-          name: Check Tagged Push
-          command: |
-            PKG_VERSION=$(cat lib/logdna/version.rb | grep VERSION | cut -d'=' -f2 | cut -d'"' -f2)
-            if [[ "${CIRCLE_TAG}" != "v${PKG_VERSION}" ]]; then
-              echo "There is mismatch:"
-              echo "  TAG_VERSION: ${CIRCLE_TAG}"
-              echo "  PKG_VERSION: v${PKG_VERSION}"
-              exit 1
-            fi
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./logdna-*.gem
-  app2rel:
-    machine: true
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Check Tagged Push
-          command: |
-            PKG_VERSION=$(cat lib/logdna/version.rb | grep VERSION | cut -d'=' -f2 | cut -d'"' -f2)
-            if [[ "${CIRCLE_TAG}" != "v${PKG_VERSION}" ]]; then
-              echo "There is mismatch:"
-              echo "  TAG_VERSION: ${CIRCLE_TAG}"
-              echo "  PKG_VERSION: v${PKG_VERSION}"
-              exit 1
-            fi
       - persist_to_workspace:
           root: .
           paths:
@@ -71,16 +52,6 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - run:
-          name: Check Tagged Push
-          command: |
-            PKG_VERSION=$(cat lib/logdna/version.rb | grep VERSION | cut -d'=' -f2 | cut -d'"' -f2)
-            if [[ "${CIRCLE_TAG}" != "v${PKG_VERSION}" ]]; then
-              echo "There is mismatch:"
-              echo "  TAG_VERSION: ${CIRCLE_TAG}"
-              echo "  PKG_VERSION: v${PKG_VERSION}"
-              exit 1
-            fi
       - run: go get -u github.com/tcnksm/ghr
       - run:
           name: Create a Release
@@ -95,80 +66,50 @@ jobs:
           root: .
           paths:
             - ./logdna-*.gem
+  app2rel:
+    machine: true
+    steps:
+      - attach_workspace:
+          at: .
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./logdna-*.gem
   release:
     docker:
       - image: circleci/ruby:2.7.0
     steps:
       - attach_workspace:
           at: .
-      - run:
-          name: Check Tagged Push
-          command: |
-            PKG_VERSION=$(cat lib/logdna/version.rb | grep VERSION | cut -d'=' -f2 | cut -d'"' -f2)
-            if [[ "${CIRCLE_TAG}" != "v${PKG_VERSION}" ]]; then
-              echo "There is mismatch:"
-              echo "  TAG_VERSION: ${CIRCLE_TAG}"
-              echo "  PKG_VERSION: v${PKG_VERSION}"
-              exit 1
-            fi
       - run: gem push logdna-*.gem -k ${RUBYGEMS_API_KEY}
 workflows:
-  version: 2
   update:
     jobs:
       - test:
-          filters:
-            tags:
-              only: /v[0-9]+\.[0-9]+\.[0-9]+/
-            branches:
-              ignore: /.*/
+          filters: *tagged_build_filters
       - build:
           requires:
             - test
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+          filters: *tagged_build_filters
       - app2pub:
           type: approval
           requires:
             - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+          filters: *tagged_build_filters
       - publish:
           requires:
             - app2pub
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+          filters: *tagged_build_filters
       - app2rel:
           type: approval
           requires:
             - publish
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+          filters: *tagged_build_filters
       - publish:
           requires:
             - app2rel
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+          filters: *tagged_build_filters
   test:
     jobs:
       - test:
-          filters:
-            branches:
-              only: /.*/
-            tags:
-              ignore: /v[0-9]+\.[0-9]+\.[0-9]+/
+          filters: *test_build_filters
