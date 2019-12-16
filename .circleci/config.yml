@@ -111,7 +111,7 @@ jobs:
               echo "  PKG_VERSION: v${PKG_VERSION}"
               exit 1
             fi
-      - run: gem push logdna-${CIRCLE_TAG}.gem -k ${RUBYGEMS_API_KEY}
+      - run: gem push logdna-*.gem -k ${RUBYGEMS_API_KEY}
 workflows:
   version: 2
   update:
