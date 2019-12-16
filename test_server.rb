@@ -31,7 +31,7 @@ class TestServer
 
         headers[line[0].chop] = line[1].strip
       end
-      data = + client.read(headers["Content-Length"].to_i)
+      data =+ client.read(headers["Content-Length"].to_i)
       client.puts(res)
       client.close
     }.join

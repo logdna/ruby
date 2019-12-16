@@ -29,7 +29,6 @@ class TestLogDNARuby < Minitest::Test
     logdna_thread = Thread.start do
       logger = Logdna::Ruby.new("pp", options)
       logger.send(level, LOG_LINE)
-      # logger.warn(LOG_LINE)
     end
 
     server_thread = Thread.start do
