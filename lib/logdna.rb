@@ -60,9 +60,7 @@ module Logdna
     end
 
     def log(message = nil, opts = {})
-      if message.nil? && block_given?
-        message = yield
-      end
+      message = yield if message.nil? && block_given?
       if message.nil?
         puts "provide either a message or block"
         return
@@ -70,22 +68,22 @@ module Logdna
       message = message.to_s.encode("UTF-8")
       @client.write_to_buffer(message, default_opts.merge(opts).merge(
                                          timestamp: (Time.now.to_f * 1000).to_i
-                                       ))
+      ))
     end
 
     Resources::LOG_LEVELS.each do |lvl|
       name = lvl.downcase
 
       define_method name do |msg = nil, opts = {}, &block|
-        self.log(msg, opts.merge(
-                        level: lvl
-                      ), &block)
+        log(msg, opts.merge(
+                   level: lvl
+        ), &block)
       end
 
       define_method "#{name}?" do
-        return Resources::LOG_LEVELS[self.level] == lvl if level.is_a? Numeric
+        return Resources::LOG_LEVELS[level] == lvl if level.is_a? Numeric
 
-        self.level == lvl
+        level == lvl
       end
     end
 
@@ -99,7 +97,7 @@ module Logdna
     def <<(msg = nil, opts = {})
       log(msg, opts.merge(
                  level: ""
-               ))
+      ))
     end
 
     def add(*_arg)
@@ -110,7 +108,7 @@ module Logdna
     def unknown(msg = nil, opts = {})
       log(msg, opts.merge(
                  level: "UNKNOWN"
-               ))
+      ))
     end
 
     def datetime_format(*_arg)
@@ -119,15 +117,11 @@ module Logdna
     end
 
     def close
-      if !@client.nil?
-        @client.exitout
-      end
+      @client.exitout unless @client.nil?
     end
 
     at_exit do
-      if !@client.nil?
-        @client.exitout
-      end
+      @client.exitout unless @client.nil?
     end
   end
 end
