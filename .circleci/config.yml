@@ -1,0 +1,174 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/ruby:2.7.0
+    steps:
+      - checkout
+      - run: bundle install
+      - run: rubocop -c .rubocop.yml -a
+  build:
+    docker:
+      - image: circleci/ruby:2.7.0
+    steps:
+      - checkout
+      - run:
+          name: Check Tagged Push
+          command: |
+            PKG_VERSION=$(cat lib/logdna/version.rb | grep VERSION | cut -d'=' -f2 | cut -d'"' -f2)
+            if [[ "${CIRCLE_TAG}" != "v${PKG_VERSION}" ]]; then
+              echo "There is mismatch:"
+              echo "  TAG_VERSION: ${CIRCLE_TAG}"
+              echo "  PKG_VERSION: v${PKG_VERSION}"
+              exit 1
+            fi
+      - run: gem build logdna.gemspec
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./logdna-*.gem
+  app2pub:
+    machine: true
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Check Tagged Push
+          command: |
+            PKG_VERSION=$(cat lib/logdna/version.rb | grep VERSION | cut -d'=' -f2 | cut -d'"' -f2)
+            if [[ "${CIRCLE_TAG}" != "v${PKG_VERSION}" ]]; then
+              echo "There is mismatch:"
+              echo "  TAG_VERSION: ${CIRCLE_TAG}"
+              echo "  PKG_VERSION: v${PKG_VERSION}"
+              exit 1
+            fi
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./logdna-*.gem
+  app2rel:
+    machine: true
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Check Tagged Push
+          command: |
+            PKG_VERSION=$(cat lib/logdna/version.rb | grep VERSION | cut -d'=' -f2 | cut -d'"' -f2)
+            if [[ "${CIRCLE_TAG}" != "v${PKG_VERSION}" ]]; then
+              echo "There is mismatch:"
+              echo "  TAG_VERSION: ${CIRCLE_TAG}"
+              echo "  PKG_VERSION: v${PKG_VERSION}"
+              exit 1
+            fi
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./logdna-*.gem
+  publish:
+    docker:
+      - image: circleci/golang:1.12
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Check Tagged Push
+          command: |
+            PKG_VERSION=$(cat lib/logdna/version.rb | grep VERSION | cut -d'=' -f2 | cut -d'"' -f2)
+            if [[ "${CIRCLE_TAG}" != "v${PKG_VERSION}" ]]; then
+              echo "There is mismatch:"
+              echo "  TAG_VERSION: ${CIRCLE_TAG}"
+              echo "  PKG_VERSION: v${PKG_VERSION}"
+              exit 1
+            fi
+      - run: go get -u github.com/tcnksm/ghr
+      - run:
+          name: Create a Release
+          command: |
+            ghr \
+              -n "LogDNA Ruby Logger ${CIRCLE_TAG}" \
+              -t ${GITHUB_TOKEN} \
+              -u ${CIRCLE_PROJECT_USERNAME} \
+              -r ${CIRCLE_PROJECT_REPONAME} \
+              -draft ${CIRCLE_TAG} ${CIRCLE_WORKING_DIRECTORY}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./logdna-*.gem
+  release:
+    docker:
+      - image: circleci/ruby:2.7.0
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Check Tagged Push
+          command: |
+            PKG_VERSION=$(cat lib/logdna/version.rb | grep VERSION | cut -d'=' -f2 | cut -d'"' -f2)
+            if [[ "${CIRCLE_TAG}" != "v${PKG_VERSION}" ]]; then
+              echo "There is mismatch:"
+              echo "  TAG_VERSION: ${CIRCLE_TAG}"
+              echo "  PKG_VERSION: v${PKG_VERSION}"
+              exit 1
+            fi
+      - run: gem push logdna-${CIRCLE_TAG}.gem -k ${RUBYGEMS_API_KEY}
+workflows:
+  version: 2
+  update:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - build:
+          requires:
+            - test
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+      - app2pub:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+      - publish:
+          requires:
+            - app2pub
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+      - app2rel:
+          type: approval
+          requires:
+            - publish
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+      - publish:
+          requires:
+            - app2rel
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
+  test:
+    jobs:
+      - test:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              ignore: /v[0-9]+\.[0-9]+\.[0-9]+/
