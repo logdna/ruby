@@ -1,7 +1,7 @@
 Gem::Specification.new do |spec|
   spec.name          = 'logdna'
   spec.version       = '1.3.0'.freeze
-  spec.authors       = 'Gun Woo Choi, Derek Zhou'
+  spec.authors       = 'Gun Woo Choi, Derek Zhou, Vilya Levitskiy, Muaz Siddiqui'
   spec.email         = 'support@logdna.com'
   spec.summary       = 'LogDNA Ruby Logger'
   spec.homepage      = 'https://github.com/logdna/ruby'
