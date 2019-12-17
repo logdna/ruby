@@ -57,11 +57,11 @@ Style/CollectionMethods:
     # inject seems more common in the community.
     reduce: "inject"
 
-Style/UnneededInterpolation:
-  Enabled: flase
+Style/RedundantInterpolation:
+  Enabled: false
 
 Style/RescueStandardError:
-    Enabled: flase
+    Enabled: false
 
 # Either allow this style or don't. Marking it as safe with parenthesis
 # is silly. Let's try to live without them for now.
@@ -85,7 +85,7 @@ Style/GuardClause:
 # Suppressing exceptions can be perfectly fine, and be it to avoid to
 # explicitly type nil into the rescue since that's what you want to return,
 # or suppressing LoadError for optional dependencies
-Lint/HandleExceptions:
+Lint/SuppressedException:
   Enabled: false
 
 # { ... } for multi-line blocks is okay, follow Weirichs rule instead:

@@ -31,7 +31,7 @@ class TestServer
 
         headers[line[0].chop] = line[1].strip
       end
-      data =+ client.read(headers["Content-Length"].to_i)
+      data = + client.read(headers["Content-Length"].to_i)
       client.puts(res)
       client.close
     }.join
@@ -43,8 +43,7 @@ class TestServer
     server = TCPServer.new(port)
     data = ""
     accept_logs_and_respond(server, data, "HTTP/1.1 404 Not Found")
-    data = +accept_logs_and_respond(server, data, "HTTP/1.1 200 OK")
-
+    data = + accept_logs_and_respond(server, data, "HTTP/1.1 200 OK")
     eval(data)
   end
 end
