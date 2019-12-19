@@ -37,15 +37,6 @@ jobs:
           root: .
           paths:
             - ./logdna-*.gem
-  app2rel:
-    machine: true
-    steps:
-      - attach_workspace:
-          at: .
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./logdna-*.gem
   release:
     docker:
       - image: circleci/golang:1.12
@@ -66,7 +57,7 @@ jobs:
           root: .
           paths:
             - ./logdna-*.gem
-  app2pub:
+  approve:
     machine: true
     steps:
       - attach_workspace:
@@ -91,23 +82,18 @@ workflows:
           requires:
             - test
           filters: *tagged_build_filters
-      - app2rel:
-          type: approval
+      - release:
           requires:
             - build
           filters: *tagged_build_filters
-      - release:
-          requires:
-            - app2rel
-          filters: *tagged_build_filters
-      - app2pub:
+      - approve:
           type: approval
           requires:
             - release
           filters: *tagged_build_filters
       - publish:
           requires:
-            - app2pub
+            - approve
           filters: *tagged_build_filters
   test:
     jobs:
