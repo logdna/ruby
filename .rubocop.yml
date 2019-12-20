@@ -125,8 +125,10 @@ Naming/BinaryOperatorParameterName:
 # also they'll fail CI anyway
 Lint/Debugger:
   Enabled: false
+
 Lint/UnusedLocalVariable:
   Enabled: true
+
 Security/Eval:
     Enabled: false
 # Style preference
