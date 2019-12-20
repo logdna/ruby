@@ -60,13 +60,11 @@ Style/RedundantInterpolation:
   Enabled: false
 
 Style/RescueStandardError:
-  Enabled: false
+    Enabled: false
 
 # Either allow this style or don't. Marking it as safe with parenthesis
 # is silly. Let's try to live without them for now.
 Style/ParenthesesAroundCondition:
-  AllowSafeAssignment: false
-Lint/AssignmentInCondition:
   AllowSafeAssignment: false
 
 # A specialized exception class will take one or more arguments and construct the message from it.
@@ -79,6 +77,9 @@ Style/RaiseArgs:
 # there's Kernel#abort for that.
 Style/SignalException:
   EnforcedStyle: only_raise
+
+Style/GuardClause:
+  Enabled: false
 
 # Suppressing exceptions can be perfectly fine, and be it to avoid to
 # explicitly type nil into the rescue since that's what you want to return,
@@ -110,6 +111,9 @@ Style/SingleLineBlockParams:
 Lint/ShadowingOuterLocalVariable:
   Enabled: false
 
+Lint/AssignmentInCondition:
+  Enabled: false
+
 # Check with yard instead.
 Style/Documentation:
   Enabled: false
@@ -122,10 +126,28 @@ Naming/BinaryOperatorParameterName:
 # also they'll fail CI anyway
 Lint/Debugger:
   Enabled: false
-
+Lint/UnusedLocalVariable:
+  Enabled: true
+Security/Eval:
+    Enabled: false
 # Style preference
 Style/MethodDefParentheses:
   Enabled: false
 
 Style/TrailingCommaInHashLiteral:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Lint/DuplicateMethods:
+  Enabled: false
+
+Style/RedundantSelf:
+   Enabled: false
+
+Style/NegatedIf:
+  Enabled: false
+
+Style/SafeNavigation:
   Enabled: false

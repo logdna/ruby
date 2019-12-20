@@ -114,9 +114,12 @@ module Logdna
     end
 
     def flush
+
       if @lock.try_lock
         @flush_scheduled = false
-        send_request if @buffer.any? || @side_messages.any?
+        if @buffer.any? || @side_messages.any?
+          send_request
+        end
         @lock.unlock
       else
         schedule_flush

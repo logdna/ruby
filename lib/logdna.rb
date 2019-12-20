@@ -50,7 +50,7 @@ module Logdna
       }
     end
 
-    def update_level=(value)
+    def level=(value)
       if value.is_a? Numeric
         @level = Resources::LOG_LEVELS[value]
         return
@@ -60,26 +60,32 @@ module Logdna
     end
 
     def log(message = nil, opts = {})
-      message = yield if message.nil? && block_given?
+      if message.nil? && block_given?
+        message = yield
+      end
       if message.nil?
         puts "provide either a message or block"
         return
       end
       message = message.to_s.encode("UTF-8")
-      @client.write_to_buffer(message, default_opts.merge(opts).merge(timestamp: (Time.now.to_f * 1000).to_i))
+      @client.write_to_buffer(message, default_opts.merge(opts).merge(
+                                         timestamp: (Time.now.to_f * 1000).to_i
+                                       ))
     end
 
     Resources::LOG_LEVELS.each do |lvl|
       name = lvl.downcase
 
       define_method name do |msg = nil, opts = {}, &block|
-        log(msg, opts.merge(level: lvl), &block)
+        self.log(msg, opts.merge(
+                        level: lvl
+                      ), &block)
       end
 
       define_method "#{name}?" do
-        return Resources::LOG_LEVELS[level] == lvl if level.is_a? Numeric
+        return Resources::LOG_LEVELS[self.level] == lvl if level.is_a? Numeric
 
-        level == lvl
+        self.level == lvl
       end
     end
 
@@ -91,7 +97,9 @@ module Logdna
     end
 
     def <<(msg = nil, opts = {})
-      log(msg, opts.merge(level: ""))
+      log(msg, opts.merge(
+                 level: ""
+               ))
     end
 
     def add(*_arg)
@@ -100,7 +108,9 @@ module Logdna
     end
 
     def unknown(msg = nil, opts = {})
-      log(msg, opts.merge(level: "UNKNOWN"))
+      log(msg, opts.merge(
+                 level: "UNKNOWN"
+               ))
     end
 
     def datetime_format(*_arg)
@@ -109,11 +119,15 @@ module Logdna
     end
 
     def close
-      @client&.exitout
+      if !@client.nil?
+        @client.exitout
+      end
     end
 
     at_exit do
-      @client&.exitout
+      if !@client.nil?
+        @client.exitout
+      end
     end
   end
 end
