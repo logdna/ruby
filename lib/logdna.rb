@@ -5,6 +5,7 @@ require "socket"
 require "uri"
 require_relative "logdna/client.rb"
 require_relative "logdna/resources.rb"
+
 module Logdna
   class ValidURLRequired < ArgumentError; end
   class MaxLengthExceeded < ArgumentError; end
@@ -38,7 +39,8 @@ module Logdna
 
       request = Net::HTTP::Post.new(uri.request_uri, "Content-Type" => "application/json")
       request.basic_auth("username", key)
-
+      request[:'user-agent'] = opts[:'user-agent'] || "ruby/#{File.open("version").read().strip()}"
+      
       @client = Logdna::Client.new(request, uri, opts)
     end
 
