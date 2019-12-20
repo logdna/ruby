@@ -1,7 +1,3 @@
-# Commonly used screens these days easily fit more than 80 characters.
-Metrics/LineLength:
-  Max: 120
-
 # Too short methods lead to extraction of single-use methods, which can make
 # the code easier to read (by naming things), but can also clutter the class
 Metrics/MethodLength:
@@ -20,9 +16,12 @@ Metrics/CyclomaticComplexity:
 Metrics/PerceivedComplexity:
   Max: 40
 
+# Commonly used screens these days easily fit more than 80 characters.
+Layout/LineLength:
+  Max: 120
+
 # No space makes the method definition shorter and differentiates
 # from a regular assignment.
-
 Layout/AccessModifierIndentation:
   Enabled: true
   IndentationWidth: 4
@@ -56,17 +55,12 @@ Style/CollectionMethods:
     # inject seems more common in the community.
     reduce: "inject"
 
-Style/RedundantInterpolation:
-  Enabled: false
-
 Style/RescueStandardError:
     Enabled: false
 
 # Either allow this style or don't. Marking it as safe with parenthesis
 # is silly. Let's try to live without them for now.
 Style/ParenthesesAroundCondition:
-  AllowSafeAssignment: false
-Lint/AssignmentInCondition:
   AllowSafeAssignment: false
 
 # A specialized exception class will take one or more arguments and construct the message from it.
@@ -80,10 +74,7 @@ Style/RaiseArgs:
 Style/SignalException:
   EnforcedStyle: only_raise
 
-# Suppressing exceptions can be perfectly fine, and be it to avoid to
-# explicitly type nil into the rescue since that's what you want to return,
-# or suppressing LoadError for optional dependencies
-Lint/SuppressedException:
+Style/GuardClause:
   Enabled: false
 
 # { ... } for multi-line blocks is okay, follow Weirichs rule instead:
@@ -110,6 +101,9 @@ Style/SingleLineBlockParams:
 Lint/ShadowingOuterLocalVariable:
   Enabled: false
 
+Lint/AssignmentInCondition:
+  Enabled: false
+
 # Check with yard instead.
 Style/Documentation:
   Enabled: false
@@ -123,9 +117,26 @@ Naming/BinaryOperatorParameterName:
 Lint/Debugger:
   Enabled: false
 
+Security/Eval:
+    Enabled: false
 # Style preference
 Style/MethodDefParentheses:
   Enabled: false
 
 Style/TrailingCommaInHashLiteral:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Lint/DuplicateMethods:
+  Enabled: false
+
+Style/RedundantSelf:
+   Enabled: false
+
+Style/NegatedIf:
+  Enabled: false
+
+Style/SafeNavigation:
   Enabled: false

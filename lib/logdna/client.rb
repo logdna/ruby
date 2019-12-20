@@ -26,6 +26,9 @@ module Logdna
 
       @request = request
       @retry_timeout = opts[:retry_timeout] || Resources::RETRY_TIMEOUT
+
+      @internal_logger = Logger.new(STDOUT)
+      @internal_logger.level = Logger::DEBUG
     end
 
     def process_message(msg, opts = {})
@@ -81,7 +84,7 @@ module Logdna
       }.to_json
 
       handle_exception = lambda do |message|
-        puts message
+        @internal_logger.debug(message)
         @exception_flag = true
         @side_message_lock.synchronize do
           @side_messages.concat(@buffer)
@@ -97,9 +100,9 @@ module Logdna
           http.request(@request)
         end
         if @response.is_a?(Net::HTTPForbidden)
-          puts "Please provide a valid ingestion key"
+          @internal_logger.debug("Please provide a valid ingestion key")
         elsif !@response.is_a?(Net::HTTPSuccess)
-          handle_exception.call("The response is not successful ")
+          handle_exception.call("The response is not successful #{@response}")
         end
         @exception_flag = false
       rescue SocketError
@@ -114,7 +117,6 @@ module Logdna
     end
 
     def flush
-
       if @lock.try_lock
         @flush_scheduled = false
         if @buffer.any? || @side_messages.any?
@@ -128,7 +130,7 @@ module Logdna
 
     def exitout
       flush
-      puts "Exiting LogDNA logger: Logging remaining messages"
+      @internal_logger.debug("Exiting LogDNA logger: Logging remaining messages")
     end
   end
 end
