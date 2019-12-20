@@ -31,8 +31,8 @@ module Logdna
       @internal_logger.level = Logger::DEBUG
     end
 
-    def process_message(msg, opts={})
-      processedMessage = {
+    def process_message(msg, opts = {})
+      processed_message = {
         line: msg,
         app: opts[:app],
         level: opts[:level],
@@ -40,16 +40,8 @@ module Logdna
         meta: opts[:meta],
         timestamp: Time.now.to_i,
       }
-      processedMessage.delete(:meta) if processedMessage[:meta].nil?
-      processedMessage
-    end
-
-    def create_flush_task
-        timer_task = Concurrent::TimerTask.new(execution_interval: @flush_interval, timeout_interval: Resources::TIMER_OUT) do |task|
-            puts 'executing'
-            self.flush
-        end
-        timer_task.execute
+      processed_message.delete(:meta) if processed_message[:meta].nil?
+      processed_message
     end
 
     def schedule_flush
@@ -77,8 +69,6 @@ module Logdna
           @side_messages.push(process_message(msg, opts))
         end
       end
-      timer_task.execute
-      timer_task
     end
 
     # This method has to be called with @lock
@@ -98,12 +88,6 @@ module Logdna
         @exception_flag = true
         @side_message_lock.synchronize do
           @side_messages.concat(@buffer)
-        rescue Timeout::Error => e
-          puts "Timeout error occurred. #{e.message}"
-          @exception_flag = true
-          @side_messages.concat(@buffer)
-        ensure
-          @buffer.clear
         end
       end
 
@@ -142,7 +126,7 @@ module Logdna
       else
         schedule_flush
       end
-   end
+    end
 
     def exitout
       flush
