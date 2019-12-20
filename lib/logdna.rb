@@ -24,7 +24,6 @@ module Logdna
       @meta = opts[:meta]
       @internal_logger = Logger.new(STDOUT)
       @internal_logger.level = Logger::DEBUG
-
       endpoint = opts[:endpoint] || Resources::ENDPOINT
       hostname = opts[:hostname] || Socket.gethostname
 

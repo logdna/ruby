@@ -55,9 +55,6 @@ Style/CollectionMethods:
     # inject seems more common in the community.
     reduce: "inject"
 
-Style/RedundantInterpolation:
-  Enabled: false
-
 Style/RescueStandardError:
     Enabled: false
 
@@ -78,12 +75,6 @@ Style/SignalException:
   EnforcedStyle: only_raise
 
 Style/GuardClause:
-  Enabled: false
-
-# Suppressing exceptions can be perfectly fine, and be it to avoid to
-# explicitly type nil into the rescue since that's what you want to return,
-# or suppressing LoadError for optional dependencies
-Lint/SuppressedException:
   Enabled: false
 
 # { ... } for multi-line blocks is okay, follow Weirichs rule instead:
@@ -125,9 +116,6 @@ Naming/BinaryOperatorParameterName:
 # also they'll fail CI anyway
 Lint/Debugger:
   Enabled: false
-
-Lint/UnusedLocalVariable:
-  Enabled: true
 
 Security/Eval:
     Enabled: false
