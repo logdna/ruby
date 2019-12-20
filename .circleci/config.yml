@@ -12,14 +12,14 @@ test_build_filters: &test_build_filters
 jobs:
   test:
     docker:
-      - image: circleci/ruby:2.7
+      - image: circleci/ruby:2.6.5
     steps:
       - checkout
       - run: bundle install
       - run: rubocop -c .rubocop.yml -a
   build:
     docker:
-      - image: circleci/ruby:2.7
+      - image: circleci/ruby:2.6.5
     steps:
       - checkout
       - run:
@@ -68,7 +68,7 @@ jobs:
             - ./logdna-*.gem
   publish:
     docker:
-      - image: circleci/ruby:2.7
+      - image: circleci/ruby:2.6.5
     steps:
       - attach_workspace:
           at: .
