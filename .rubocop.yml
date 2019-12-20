@@ -57,10 +57,10 @@ Style/CollectionMethods:
     reduce: "inject"
 
 Style/UnneededInterpolation:
-  Enabled: flase
+  Enabled: false
 
 Style/RescueStandardError:
-    Enabled: flase
+    Enabled: false
 
 # Either allow this style or don't. Marking it as safe with parenthesis
 # is silly. Let's try to live without them for now.
