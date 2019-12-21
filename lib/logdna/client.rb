@@ -99,6 +99,7 @@ module Logdna
         ) do |http|
           http.request(@request)
         end
+
         if @response.is_a?(Net::HTTPForbidden)
           @internal_logger.debug("Please provide a valid ingestion key")
         elsif !@response.is_a?(Net::HTTPSuccess)

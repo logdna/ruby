@@ -15,11 +15,11 @@ module Logdna
     # uncomment line below and line 3 to enforce singleton
     # include Singleton
     Logger::TRACE = 5
-    attr_accessor :level, :app, :env, :meta
+    attr_accessor :log_level, :app, :env, :meta
 
     def initialize(key, opts = {})
       @app = opts[:app] || "default"
-      @level = opts[:level] || "INFO"
+      @log_level = opts[:level] || "INFO"
       @env = opts[:env]
       @meta = opts[:meta]
       @internal_logger = Logger.new(STDOUT)
@@ -46,7 +46,7 @@ module Logdna
     def default_opts
       {
         app: @app,
-        level: @level,
+        level: @log_level,
         env: @env,
         meta: @meta,
       }
@@ -54,11 +54,11 @@ module Logdna
 
     def level=(value)
       if value.is_a? Numeric
-        @level = Resources::LOG_LEVELS[value]
+        @log_level = Resources::LOG_LEVELS[value]
         return
       end
 
-      @level = value
+      @log_level = value
     end
 
     def log(message = nil, opts = {})
@@ -93,7 +93,7 @@ module Logdna
 
     def clear
       @app = "default"
-      @level = "INFO"
+      @log_level = "INFO"
       @env = nil
       @meta = nil
     end

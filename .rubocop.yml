@@ -17,7 +17,7 @@ Metrics/PerceivedComplexity:
   Max: 40
 
 # Commonly used screens these days easily fit more than 80 characters.
-Layout/LineLength:
+Metrics/LineLength:
   Max: 120
 
 # No space makes the method definition shorter and differentiates
@@ -130,7 +130,7 @@ Style/IfUnlessModifier:
   Enabled: false
 
 Lint/DuplicateMethods:
-  Enabled: false
+  Enabled: true
 
 Style/RedundantSelf:
    Enabled: false
@@ -139,4 +139,13 @@ Style/NegatedIf:
   Enabled: false
 
 Style/SafeNavigation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+
+Style/RedundantFreeze:
+  Enabled: true
+
+Style/MutableConstant:
   Enabled: false
