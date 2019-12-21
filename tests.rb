@@ -79,7 +79,7 @@ class TestLogDNARuby < Minitest::Test
     log_level_test("warn", 2000, "WARN")
     log_level_test("info", 2001, "INFO")
     log_level_test("fatal", 2002, "FATAL")
-    log_level_test("debug", 2003, "Lala")
+    log_level_test("debug", 2003, "DEBUG")
     fatal_method_not_found("fatal", 2004, "FATAL")
   end
 end
