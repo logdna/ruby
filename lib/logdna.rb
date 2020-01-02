@@ -15,7 +15,7 @@ module Logdna
     # uncomment line below and line 3 to enforce singleton
     # include Singleton
     Logger::TRACE = 5
-    attr_accessor :app, :env, :meta
+    attr_accessor :level, :app, :env, :meta
 
     def initialize(key, opts = {})
       @app = opts[:app] || "default"
