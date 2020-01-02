@@ -140,9 +140,3 @@ Style/NegatedIf:
 
 Style/SafeNavigation:
   Enabled: false
-
-Style/FrozenStringLiteralComment:
-  Enabled: true
-
-Style/RedundantFreeze:
-  Enabled: true
