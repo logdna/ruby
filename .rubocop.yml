@@ -146,6 +146,3 @@ Style/FrozenStringLiteralComment:
 
 Style/RedundantFreeze:
   Enabled: true
-
-Style/MutableConstant:
-  Enabled: false
