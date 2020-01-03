@@ -81,7 +81,6 @@ Clear current metadata, level, appname, environment
     logger.clear
 
 Check current log level:
-
     logger.info? => true
     logger.warn? => false
 
@@ -94,13 +93,14 @@ Log a message with a particular level easily
 
 Hostname and app name cannot be more than 80 characters.
 
-## Rails Setup
+### Rails Setup
+In your `config/environments/environment.rb`:
 
-In your `environments/environment.rb`:
-
+  ```
   Rails.application.configure do
-    config.logger = Logdna::Ruby.new(our_api_key, options)
+    config.logger = Logdna::Ruby.new(your_api_key, options)
   end
+  ```
 
 # Important Notes
 
