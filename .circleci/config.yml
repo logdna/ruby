@@ -16,7 +16,7 @@ jobs:
     steps:
       - checkout
       - run: bundle install
-      - run: run: rubocop -c .rubocop.yml
+      - run: rubocop -c .rubocop.yml
       - run: ruby tests.rb
   build:
     docker:
