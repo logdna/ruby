@@ -81,6 +81,7 @@ Clear current metadata, level, appname, environment
     logger.clear
 
 Check current log level:
+
     logger.info? => true
     logger.warn? => false
 
