@@ -81,7 +81,6 @@ Clear current metadata, level, appname, environment
     logger.clear
 
 Check current log level:
-    
     logger.info? => true
     logger.warn? => false
 
@@ -94,11 +93,19 @@ Log a message with a particular level easily
 
 Hostname and app name cannot be more than 80 characters.
 
+### Rails Setup
+In your `config/environments/environment.rb`:
+
+  ```
+  Rails.application.configure do
+    config.logger = Logdna::Ruby.new(your_api_key, options)
+  end
+  ```
 
 # Important Notes
 
 1. This logger assumes that you pass in json formatted data
-2. This logger is a singleton (do not create mutiple instances of the logger) even though the singleton structure is not strongly enforced. 
+2. This logger is a singleton (do not create mutiple instances of the logger) even though the singleton structure is not strongly enforced.
 
 # API
 
@@ -119,7 +126,7 @@ Instantiates a new instance of the class it is called on. ingestion_key is requi
 |{ :flushtime => Log flush interval in seconds } | 0.25 seconds |
 |{ :flushbyte => Log flush upper limit in bytes } | 500000 bytes ~= 0.5 megabytes |
 
-Different log level displays log messages in different colors as well. 
+Different log level displays log messages in different colors as well.
 - ![TRACE DEBUG INFO Colors](https://placehold.it/15/515151/000000?text=+)   "Trace"  "Debug"  "Info"
 - ![WARN Color](https://placehold.it/15/ec9563/000000?text=+)   "Warn"
 - ![ERROR Fatal Colors](https://placehold.it/15/e37e7d/000000?text=+)   "Error"  "Fatal"
