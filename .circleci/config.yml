@@ -17,6 +17,7 @@ jobs:
       - checkout
       - run: bundle install
       - run: rubocop -c .rubocop.yml
+      - run: ruby tests.rb
   build:
     docker:
       - image: circleci/ruby:2.6.5
