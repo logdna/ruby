@@ -130,7 +130,7 @@ Style/IfUnlessModifier:
   Enabled: false
 
 Lint/DuplicateMethods:
-  Enabled: false
+  Enabled: true
 
 Style/RedundantSelf:
    Enabled: false
