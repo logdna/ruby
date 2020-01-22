@@ -49,7 +49,7 @@ module Logdna
         sleep(@exception_flag ? @retry_timeout : @flush_interval)
         flush if @flush_scheduled
       }
-      thread = Thread.new { start_timer }
+      thread = Thread.new { start_timer.call }
       thread.join
     end
 
@@ -63,7 +63,7 @@ module Logdna
         @lock.unlock
 
         flush if @flush_limit <= @buffer_byte_size
-        schedule_flush unless @flush_scheduled
+        schedule_flush
       else
         @side_message_lock.synchronize do
           @side_messages.push(process_message(msg, opts))
