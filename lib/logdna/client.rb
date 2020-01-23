@@ -62,8 +62,11 @@ module Logdna
         @flush_scheduled = true
         @lock.unlock
 
-        flush if @flush_limit <= @buffer_byte_size
-        schedule_flush
+        if @flush_limit <= @buffer_byte_size
+          flush
+        else
+          schedule_flush
+        end
       else
         @side_message_lock.synchronize do
           @side_messages.push(process_message(msg, opts))
