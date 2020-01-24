@@ -53,7 +53,7 @@ jobs:
               -t ${GITHUB_TOKEN} \
               -u ${CIRCLE_PROJECT_USERNAME} \
               -r ${CIRCLE_PROJECT_REPONAME} \
-              -draft ${CIRCLE_TAG} ${CIRCLE_WORKING_DIRECTORY}
+              -draft ${CIRCLE_TAG} ./
       - persist_to_workspace:
           root: .
           paths:
