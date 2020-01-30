@@ -2,8 +2,8 @@
 
 require "minitest/autorun"
 
-require_relative "lib/logdna.rb"
-require_relative "lib/logdna/client.rb"
+require_relative "../lib/logdna.rb"
+require_relative "../lib/logdna/client.rb"
 require_relative "test_server.rb"
 
 class TestLogDNARuby < Minitest::Test
