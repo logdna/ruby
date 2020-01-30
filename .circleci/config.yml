@@ -73,9 +73,11 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - run: mkdir -p ~/.gem && touch ~/.gem/credentials
-      - run: echo "---\n:rubygems_api_key:\t${RUBYGEMS_API_KEY}" >> ~/.gem/credentials
-      - run: gem push logdna-*.gem -k rubygems_api_key
+      - run: |
+          mkdir -p ~/.gem && touch ~/.gem/credentials
+          echo "---\n:rubygems_api_key:\t${RUBYGEMS_API_KEY}" >> ~/.gem/credentials
+          chmod 0600 ~/.gem/credentials
+          gem push logdna-*.gem -k rubygems_api_key
 workflows:
   update:
     jobs:
