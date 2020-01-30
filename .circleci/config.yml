@@ -73,7 +73,8 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - run: gem push logdna-*.gem -k ${RUBYGEMS_API_KEY}
+      - run: echo "---\n:rubygems_api_key:\t${RUBYGEMS_API_KEY}" >> ~/.gem/credentials
+      - run: gem push logdna-*.gem -k rubygems_api_key
 workflows:
   update:
     jobs:
