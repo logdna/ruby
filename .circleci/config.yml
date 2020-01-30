@@ -77,10 +77,7 @@ jobs:
           name: Setup gem credentials
           command: |
             mkdir -p ~/.gem/
-            cat <<EOF >~/.gem/credentials
-            ---
-            :rubygems_api_key: ${RUBYGEMS_API_KEY}
-            EOF
+            echo "---\n:rubygems_api_key: ${RUBYGEMS_API_KEY}" >> ~/.gem/credentials
             chmod 600 ~/.gem/credentials
       - run: gem signin
       - run: gem push *.gem
