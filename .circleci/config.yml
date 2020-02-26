@@ -33,11 +33,11 @@ jobs:
               echo "  PKG_VERSION: v${PKG_VERSION}"
               exit 1
             fi
-      - run: gem build logdna.gemspec
+      - run: gem build logdna.gemspec -o logdna.gem
       - persist_to_workspace:
           root: .
           paths:
-            - ./logdna-*.gem
+            - ./logdna.gem
   release:
     docker:
       - image: circleci/golang:1.12
@@ -57,7 +57,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - ./logdna-*.gem
+            - ./logdna.gem
   approve:
     machine: true
     steps:
@@ -66,7 +66,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - ./logdna-*.gem
+            - ./logdna.gem
   publish:
     docker:
       - image: circleci/ruby:2.6.5
@@ -76,11 +76,13 @@ jobs:
       - run:
           name: Setup gem credentials
           command: |
-            mkdir -p ~/.gem/
-            echo "---\n:rubygems_api_key: ${RUBYGEMS_API_KEY}" >> ~/.gem/credentials
-            chmod 600 ~/.gem/credentials
-      - run: gem signin
-      - run: gem push *.gem
+            mkdir -p ~/.gem
+            cat \<<EOF > ~/.gem/credentials
+            ---
+            :rubygems_api_key: ${RUBYGEMS_API_KEY}
+            EOF
+            chmod 0600 ~/.gem/credentials
+      - run: gem push logdna.gem
 workflows:
   update:
     jobs:

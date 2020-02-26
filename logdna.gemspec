@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.name = "logdna"
   spec.version = version
   spec.authors       = "Gun Woo Choi, Derek Zhou, Vilya Levitskiy, Muaz Siddiqui"
-  spec.email         = "support@logdna.com"
+  spec.email         = "apps+rubygems@logdna.com"
   spec.summary       = "LogDNA Ruby logger"
   spec.homepage      = "https://github.com/logdna/ruby"
   spec.license       = "MIT"
