@@ -48,7 +48,7 @@ Options are optional variables that may contain hostname, app name, mac address,
         :ip =>  myIpAddress,
         :mac => myMacAddress,
         :app => myAppName,
-        :level => "INFO",    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level
+        :level => "INFO",    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level (custom levels for Rails have to be sent with a log message)
         :env => "PRODUCTION",
         :meta => {:once => {:first => "nested1", :another => "nested2"}},
         :endpoint => "https://fqdn/logs/ingest"

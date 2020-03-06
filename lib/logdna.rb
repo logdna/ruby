@@ -52,6 +52,10 @@ module Logdna
       }
     end
 
+    def level
+      @log_level
+    end
+
     def level=(value)
       if value.is_a? Numeric
         @log_level = Resources::LOG_LEVELS[value]
