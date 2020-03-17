@@ -50,7 +50,6 @@ module Logdna
         flush if @flush_scheduled
       }
       thread = Thread.new { start_timer.call }
-      thread.join
     end
 
     def write_to_buffer(msg, opts)
