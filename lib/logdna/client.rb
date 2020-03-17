@@ -49,7 +49,7 @@ module Logdna
         sleep(@exception_flag ? @retry_timeout : @flush_interval)
         flush if @flush_scheduled
       }
-      thread = Thread.new { start_timer.call }
+      Thread.new { start_timer.call }
     end
 
     def write_to_buffer(msg, opts)
