@@ -6,6 +6,7 @@ require "json"
 require "concurrent"
 require "date"
 
+
 module Logdna
   class Client
     def initialize(request, uri, opts)
@@ -60,9 +61,8 @@ module Logdna
         @buffer_byte_size += new_message_size
         @flush_scheduled = true
         @lock.unlock
-
         if @flush_limit <= @buffer_byte_size
-          flush
+          Thread.new { flush }
         else
           schedule_flush
         end
@@ -131,7 +131,7 @@ module Logdna
     end
 
     def exitout
-      flush
+      Thread.new { flush }
       @internal_logger.debug("Exiting LogDNA logger: Logging remaining messages")
     end
   end
