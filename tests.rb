@@ -47,13 +47,12 @@ class TestLogDNARuby < Minitest::Test
   end
 
   # Should retry to connect and preserve the failed line
-  def fatal_method_not_found(level, port, expected_level)
+  def retry_test(level, port, _expected_level)
     second_line = " second line"
     options = get_options(port)
+
     logger = Logdna::Ruby.new("pp", options)
-    logdna_thread = Thread.start do
-      logger.send(level, LOG_LINE)
-    end
+    logger.send(level, LOG_LINE)
 
     server_thread = Thread.start do
       server_generator = TestServer.new
@@ -68,13 +67,8 @@ class TestLogDNARuby < Minitest::Test
       # The order of recieved lines is unpredictable.
       assert_includes([recieved_data[:ls][0][:line], recieved_data[:ls][1][:line]], LOG_LINE)
       assert_includes([recieved_data[:ls][0][:line], recieved_data[:ls][1][:line]], second_line)
-      ####
-      assert_equal(recieved_data[:ls][0][:app], options[:app])
-      assert_equal(recieved_data[:ls][0][:level], expected_level)
-      assert_equal(recieved_data[:ls][0][:env], options[:env])
     end
 
-    logdna_thread.join
     server_thread.join
   end
 
@@ -83,6 +77,6 @@ class TestLogDNARuby < Minitest::Test
     log_level_test("info", 2001, "INFO")
     log_level_test("fatal", 2002, "FATAL")
     log_level_test("debug", 2003, "DEBUG")
-    fatal_method_not_found("fatal", 2004, "FATAL")
+    retry_test("fatal", 2004, "FATAL")
   end
 end
