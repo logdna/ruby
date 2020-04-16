@@ -61,7 +61,6 @@ module Logdna
 
         if @flush_limit <= @buffer_byte_size
           Thread.new { flush }
-          # flush
         else
           @flush_scheduled = true
           schedule_flush

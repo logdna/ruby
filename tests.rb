@@ -33,7 +33,6 @@ class TestLogDNARuby < Minitest::Test
 
     server_thread = Thread.start do
       serverGenerator = TestServer.new
-      # recieved_data = server.start_server(port)
       server = serverGenerator.start_server(port)
       recieved_data = serverGenerator.accept_logs_and_respond(server, "HTTP/1.1 200 OK")
 
