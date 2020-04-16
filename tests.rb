@@ -32,8 +32,11 @@ class TestLogDNARuby < Minitest::Test
     end
 
     server_thread = Thread.start do
-      server = TestServer.new
-      recieved_data = server.start_server(port)
+      serverGenerator = TestServer.new
+      # recieved_data = server.start_server(port)
+      server = serverGenerator.start_server(port)
+      recieved_data = serverGenerator.accept_logs_and_respond(server, "HTTP/1.1 200 OK")
+
       assert_equal(recieved_data[:ls][0][:line], LOG_LINE)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
       assert_equal(recieved_data[:ls][0][:level], expected_level)
@@ -48,24 +51,25 @@ class TestLogDNARuby < Minitest::Test
   def fatal_method_not_found(level, port, expected_level)
     second_line = " second line"
     options = get_options(port)
+    logger = Logdna::Ruby.new("pp", options)
     logdna_thread = Thread.start do
-      logger = Logdna::Ruby.new("pp", options)
       logger.send(level, LOG_LINE)
-      logger.send(level, second_line)
     end
 
     server_thread = Thread.start do
-      sor = TestServer.new
-      recieved_data = sor.return_not_found_res(port)
+      serverGenerator = TestServer.new
+      server = serverGenerator.start_server(port)
+      serverGenerator.accept_logs_and_respond(server, "HTTP/1.1 404 Not Found")
+      # make a second request
+      logger.send(level, second_line)
+      recieved_data = serverGenerator.accept_logs_and_respond(server, "HTTP/1.1 202 Not Found")
+
+      # should contain lines from both requests
+      assert_equal(recieved_data[:ls].size, 2)
       # The order of recieved lines is unpredictable.
-      recieved_lines = [
-        recieved_data[:ls][0][:line],
-        recieved_data[:ls][1][:line]
-      ]
-
-      assert_includes(recieved_lines, LOG_LINE)
-      assert_includes(recieved_lines, second_line)
-
+      assert_includes([recieved_data[:ls][0][:line], recieved_data[:ls][1][:line]], LOG_LINE)
+      assert_includes([recieved_data[:ls][0][:line], recieved_data[:ls][1][:line]], second_line)
+      ####
       assert_equal(recieved_data[:ls][0][:app], options[:app])
       assert_equal(recieved_data[:ls][0][:level], expected_level)
       assert_equal(recieved_data[:ls][0][:env], options[:env])

@@ -53,22 +53,18 @@ module Logdna
     end
 
     def write_to_buffer(msg, opts)
-      if @lock.try_lock
+      @lock.synchronize do
         processed_message = process_message(msg, opts)
         new_message_size = processed_message.to_s.bytesize
         @buffer.push(processed_message)
         @buffer_byte_size += new_message_size
-        @flush_scheduled = true
-        @lock.unlock
 
         if @flush_limit <= @buffer_byte_size
           Thread.new { flush }
+          # flush
         else
+          @flush_scheduled = true
           schedule_flush
-        end
-      else
-        @side_message_lock.synchronize do
-          @side_messages.push(process_message(msg, opts))
         end
       end
     end
@@ -131,7 +127,9 @@ module Logdna
     end
 
     def exitout
-      Thread.new { flush }
+      if @buffer.any? || @side_messages.any?
+        Thread.new { flush }
+      end
       @internal_logger.debug("Exiting LogDNA logger: Logging remaining messages")
     end
   end
