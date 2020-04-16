@@ -2,9 +2,9 @@
 
 require "minitest/autorun"
 
-require_relative "lib/logdna.rb"
-require_relative "lib/logdna/client.rb"
-require_relative "test_server.rb"
+require_relative "../lib/logdna"
+require_relative "../lib/logdna/client"
+require_relative "test_server"
 
 class TestLogDNARuby < Minitest::Test
   LOG_LINE = "log line"
@@ -32,8 +32,10 @@ class TestLogDNARuby < Minitest::Test
     end
 
     server_thread = Thread.start do
-      server = TestServer.new
-      recieved_data = server.start_server(port)
+      server_generator = TestServer.new
+      server = server_generator.start_server(port)
+      recieved_data = server_generator.accept_logs_and_respond(server, "HTTP/1.1 200 OK")
+
       assert_equal(recieved_data[:ls][0][:line], LOG_LINE)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
       assert_equal(recieved_data[:ls][0][:level], expected_level)
@@ -45,33 +47,29 @@ class TestLogDNARuby < Minitest::Test
   end
 
   # Should retry to connect and preserve the failed line
-  def fatal_method_not_found(level, port, expected_level)
+  def retry_test(level, port, _expected_level)
     second_line = " second line"
     options = get_options(port)
-    logdna_thread = Thread.start do
-      logger = Logdna::Ruby.new("pp", options)
-      logger.send(level, LOG_LINE)
-      logger.send(level, second_line)
-    end
+
+    logger = Logdna::Ruby.new("pp", options)
+    logger.send(level, LOG_LINE)
 
     server_thread = Thread.start do
-      sor = TestServer.new
-      recieved_data = sor.return_not_found_res(port)
+      server_generator = TestServer.new
+      server = server_generator.start_server(port)
+      server_generator.accept_logs_and_respond(server, "HTTP/1.1 408 Request Timeout")
+      # make a second request
+      logger.send(level, second_line)
+
+      # Both lines will come back in separate requests
+      recieved_data1 = server_generator.accept_logs_and_respond(server, "HTTP/1.1 200 OK")
+      recieved_data2 = server_generator.accept_logs_and_respond(server, "HTTP/1.1 200 OK")
+
       # The order of recieved lines is unpredictable.
-      recieved_lines = [
-        recieved_data[:ls][0][:line],
-        recieved_data[:ls][1][:line]
-      ]
-
-      assert_includes(recieved_lines, LOG_LINE)
-      assert_includes(recieved_lines, second_line)
-
-      assert_equal(recieved_data[:ls][0][:app], options[:app])
-      assert_equal(recieved_data[:ls][0][:level], expected_level)
-      assert_equal(recieved_data[:ls][0][:env], options[:env])
+      assert_includes([recieved_data1[:ls][0][:line], recieved_data2[:ls][0][:line]], LOG_LINE)
+      assert_includes([recieved_data1[:ls][0][:line], recieved_data2[:ls][0][:line]], second_line)
     end
 
-    logdna_thread.join
     server_thread.join
   end
 
@@ -80,6 +78,6 @@ class TestLogDNARuby < Minitest::Test
     log_level_test("info", 2001, "INFO")
     log_level_test("fatal", 2002, "FATAL")
     log_level_test("debug", 2003, "DEBUG")
-    fatal_method_not_found("fatal", 2004, "FATAL")
+    retry_test("fatal", 2004, "FATAL")
   end
 end

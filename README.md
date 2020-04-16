@@ -123,8 +123,12 @@ Instantiates a new instance of the class it is called on. ingestion_key is requi
 |{ :env => STAGING, PRODUCTION .. etc} | Nil |
 |{ :meta => metadata} | Nil |
 |{ :endpoint => LogDNA Ingestion URI | 'https://logs.logdna.com/logs/ingest' |
-|{ :flushtime => Log flush interval in seconds } | 0.25 seconds |
-|{ :flushbyte => Log flush upper limit in bytes } | 500000 bytes ~= 0.5 megabytes |
+|{ :flush_interval => Limit to trigger a flush in seconds } | 0.25 seconds |
+|{ :flush_size => Limit to trigger a flush in bytes } | 2097152 bytes = 2 MiB |
+|{ :request_size => Upper limit of request in bytes } | 2097152 bytes = 2 MiB |
+|{ :retry_timeout => Base timeout for retries in seconds } | 0.25 seconds |
+|{ :retry_max_attempts => Maximum number of retries per request } | 3 attempts |
+|{ :retry_max_jitter => Maximum amount of jitter to add to each retry request in seconds } | 0.25 seconds |
 
 Different log level displays log messages in different colors as well.
 - ![TRACE DEBUG INFO Colors](https://placehold.it/15/515151/000000?text=+)   "Trace"  "Debug"  "Info"
