@@ -32,9 +32,9 @@ class TestLogDNARuby < Minitest::Test
     end
 
     server_thread = Thread.start do
-      serverGenerator = TestServer.new
-      server = serverGenerator.start_server(port)
-      recieved_data = serverGenerator.accept_logs_and_respond(server, "HTTP/1.1 200 OK")
+      server_generator = TestServer.new
+      server = server_generator.start_server(port)
+      recieved_data = server_generator.accept_logs_and_respond(server, "HTTP/1.1 200 OK")
 
       assert_equal(recieved_data[:ls][0][:line], LOG_LINE)
       assert_equal(recieved_data[:ls][0][:app], options[:app])
@@ -56,12 +56,12 @@ class TestLogDNARuby < Minitest::Test
     end
 
     server_thread = Thread.start do
-      serverGenerator = TestServer.new
-      server = serverGenerator.start_server(port)
-      serverGenerator.accept_logs_and_respond(server, "HTTP/1.1 404 Not Found")
+      server_generator = TestServer.new
+      server = server_generator.start_server(port)
+      server_generator.accept_logs_and_respond(server, "HTTP/1.1 404 Not Found")
       # make a second request
       logger.send(level, second_line)
-      recieved_data = serverGenerator.accept_logs_and_respond(server, "HTTP/1.1 202 Not Found")
+      recieved_data = server_generator.accept_logs_and_respond(server, "HTTP/1.1 202 Not Found")
 
       # should contain lines from both requests
       assert_equal(recieved_data[:ls].size, 2)
