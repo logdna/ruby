@@ -3,12 +3,13 @@
 require "logger"
 require "socket"
 require "uri"
-require_relative "logdna/client.rb"
-require_relative "logdna/resources.rb"
-require_relative "logdna/version.rb"
+require_relative "logdna/client"
+require_relative "logdna/resources"
+require_relative "logdna/version"
 
 module Logdna
   class ValidURLRequired < ArgumentError; end
+
   class MaxLengthExceeded < ArgumentError; end
 
   class Ruby < ::Logger
@@ -18,11 +19,12 @@ module Logdna
     attr_accessor :app, :env, :meta
 
     def initialize(key, opts = {})
+      super(nil, nil, nil)
       @app = opts[:app] || "default"
       @log_level = opts[:level] || "INFO"
       @env = opts[:env]
       @meta = opts[:meta]
-      @internal_logger = Logger.new(STDOUT)
+      @internal_logger = Logger.new($stdout)
       @internal_logger.level = Logger::DEBUG
       endpoint = opts[:endpoint] || Resources::ENDPOINT
       hostname = opts[:hostname] || Socket.gethostname
@@ -125,10 +127,6 @@ module Logdna
     end
 
     def close
-      @client&.exitout
-    end
-
-    at_exit do
       @client&.exitout
     end
   end
