@@ -135,7 +135,7 @@ module Logdna
         ls: slice
       }.to_json
 
-      flush_id = "#{Random.uuid} [#{slice.length} lines]"
+      flush_id = "#{SecureRandom.uuid} [#{slice.length} lines]"
       error_header = "Flush {#{flush_id}} failed."
       tries = 0
       loop do
