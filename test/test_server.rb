@@ -20,7 +20,7 @@ class TestServer
       data += client.read(headers["Content-Length"].to_i)
       client.puts(res)
       client.close
-    }.join
+    }.join(60)
 
     eval(data)
   end

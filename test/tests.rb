@@ -42,8 +42,8 @@ class TestLogDNARuby < Minitest::Test
       assert_equal(recieved_data[:ls][0][:env], options[:env])
     end
 
-    logdna_thread.join
-    server_thread.join
+    assert logdna_thread.join(10), "Logdna thread timeout for port #{port}"
+    assert server_thread.join(10), "Server thread timeout for port #{port}"
   end
 
   # Should retry to connect and preserve the failed line
@@ -70,7 +70,7 @@ class TestLogDNARuby < Minitest::Test
       assert_includes([recieved_data1[:ls][0][:line], recieved_data2[:ls][0][:line]], second_line)
     end
 
-    server_thread.join
+    assert server_thread.join(10), "Server thread timeout for retry test"
   end
 
   def test_all
