@@ -123,6 +123,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "mindjiver",
+      "name": "Peter Jönsson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/518143?v=4",
+      "profile": "https://ximian.io/",
+      "contributions": [
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7
