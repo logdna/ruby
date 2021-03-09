@@ -1,6 +1,6 @@
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-16-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-17-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 <p align="center">
   <a href="https://app.logdna.com">
@@ -196,6 +196,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="http://blog.burningbush.us/"><img src="https://avatars.githubusercontent.com/u/6078?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jon Moses</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=jmoses" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/bnauta"><img src="https://avatars.githubusercontent.com/u/1395049?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Brad</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=bnauta" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=bnauta" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/dchai76"><img src="https://avatars.githubusercontent.com/u/13873467?v=4?s=100" width="100px;" alt=""/><br /><sub><b>DChai</b></sub></a><br /><a href="https://github.com/logdna/ruby/pulls?q=is%3Apr+reviewed-by%3Adchai76" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/logdna/ruby/commits?author=dchai76" title="Code">💻</a></td>
   </tr>
 </table>
 
