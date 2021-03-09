@@ -142,6 +142,15 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "jmoses",
+      "name": "Jon Moses",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6078?v=4",
+      "profile": "http://blog.burningbush.us/",
+      "contributions": [
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7
