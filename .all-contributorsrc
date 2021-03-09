@@ -96,6 +96,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "machadolab",
+      "name": "Mike Machado",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1002843?v=4",
+      "profile": "https://github.com/machadolab",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7
