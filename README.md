@@ -1,6 +1,6 @@
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 <p align="center">
   <a href="https://app.logdna.com">
@@ -189,6 +189,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://flybreeze.com/"><img src="https://avatars.githubusercontent.com/u/1904267?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dee Evans</b></sub></a><br /><a href="https://github.com/logdna/ruby/issues?q=author%3ADeekor" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/machadolab"><img src="https://avatars.githubusercontent.com/u/1002843?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mike Machado</b></sub></a><br /><a href="https://github.com/logdna/ruby/issues?q=author%3Amachadolab" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://nytefyre.net/"><img src="https://avatars.githubusercontent.com/u/372939?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Greg Swift</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=gregswift" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Kenneth-KT"><img src="https://avatars.githubusercontent.com/u/2994474?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kenneth-KT</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=Kenneth-KT" title="Code">💻</a></td>
   </tr>
 </table>
 
