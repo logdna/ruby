@@ -1,6 +1,6 @@
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 <p align="center">
   <a href="https://app.logdna.com">
@@ -182,6 +182,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/vilyapilya"><img src="https://avatars.githubusercontent.com/u/17367511?v=4?s=100" width="100px;" alt=""/><br /><sub><b>vilyapilya</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=vilyapilya" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=vilyapilya" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/respectus"><img src="https://avatars.githubusercontent.com/u/1046364?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Muaz Siddiqui</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=respectus" title="Code">💻</a> <a href="#maintenance-respectus" title="Maintenance">🚧</a> <a href="https://github.com/logdna/ruby/pulls?q=is%3Apr+reviewed-by%3Arespectus" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://github.com/badosu"><img src="https://avatars.githubusercontent.com/u/347552?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Amadeus Folego</b></sub></a><br /><a href="https://github.com/logdna/ruby/issues?q=author%3Abadosu" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/mansoorelahi"><img src="https://avatars.githubusercontent.com/u/858265?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mansoor</b></sub></a><br /><a href="https://github.com/logdna/ruby/issues?q=author%3Amansoorelahi" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
