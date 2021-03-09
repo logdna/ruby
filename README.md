@@ -28,7 +28,9 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install logdna
+```bash
+$ gem install logdna
+```
 
 
 
@@ -36,49 +38,63 @@ Or install it yourself as:
 
 After installation, call
 
-    logger = Logdna::Ruby.new(your_api_key, options)
-    => #<Logdna::Ruby:0x00000000000000>
+```ruby
+logger = Logdna::Ruby.new(your_api_key, options)
+#<Logdna::Ruby:0x00000000000000>
+```
 
 to set up the logger.
 
 Options are optional variables that may contain hostname, app name, mac address, ip address, log level specified.
 
-    options = {
-        :hostname => myHostName,
-        :ip =>  myIpAddress,
-        :mac => myMacAddress,
-        :app => myAppName,
-        :level => "INFO",    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level (custom levels for Rails have to be sent with a log message)
-        :env => "PRODUCTION",
-        :meta => {:once => {:first => "nested1", :another => "nested2"}},
-        :endpoint => "https://fqdn/logs/ingest"
-    }
+```ruby
+options = {
+    :hostname => myHostName,
+    :ip =>  myIpAddress,
+    :mac => myMacAddress,
+    :app => myAppName,
+    :level => "INFO",    # LOG_LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'] or your customized log level (custom levels for Rails have to be sent with a log message)
+    :env => "PRODUCTION",
+    :meta => {:once => {:first => "nested1", :another => "nested2"}},
+    :endpoint => "https://fqdn/logs/ingest"
+}
+```
 
 To send logs, use "log" method. Default log level is "INFO"
 
-    logger.log('This is my first log')
-    => "Saved"  # Saved to buffer. Ready to be flushed automatically
+```ruby
+logger.log('This is my first log')
+=> "Saved"  # Saved to buffer. Ready to be flushed automatically
+```
 
 Optionally you can use a block to do so
 
-    logger.log { 'This is my second log' }
-    => "Saved"
+```ruby
+logger.log { 'This is my second log' }
+=> "Saved"
+```
 
 Log a message with particular metadata, level, appname, environment (one-time)
 
-    logger.log('This is warn message', {:meta => {:meta => "data"}, :level => "WARN", :app => "awesome", :env => "DEVELOPMENT"})
+```ruby
+logger.log('This is warn message', {:meta => {:meta => "data"}, :level => "WARN", :app => "awesome", :env => "DEVELOPMENT"})
+```
 
 Log a message with lasting metadata, level, appname, environment (lasting)
 
-    logger.meta = {:once => {:first => "nested1", :another => "nested2"}}
-    logger.level = 'FATAL'  or  logger.level = Logger::FATAL
-    logger.app = 'NEW APP NAME'
-    logger.env = 'PRODUCTION'
-    logger.log('This messages and messages afterwards all have the above values')
+```ruby
+logger.meta = {:once => {:first => "nested1", :another => "nested2"}}
+logger.level = 'FATAL'  or  logger.level = Logger::FATAL
+logger.app = 'NEW APP NAME'
+logger.env = 'PRODUCTION'
+logger.log('This messages and messages afterwards all have the above values')
+```
 
 Clear current metadata, level, appname, environment
 
-    logger.clear
+```ruby
+logger.clear
+```
 
 Check current log level:
     logger.info? => true
@@ -86,21 +102,23 @@ Check current log level:
 
 Log a message with a particular level easily
 
-    logger.warn('This is a warning message')
-    logger.fatal('This is a fatal message')
-    logger.debug { 'This is a debug message' }
-
+```ruby
+logger.warn('This is a warning message')
+logger.fatal('This is a fatal message')
+logger.debug { 'This is a debug message' }
+```
 
 Hostname and app name cannot be more than 80 characters.
 
 ### Rails Setup
+
 In your `config/environments/environment.rb`:
 
-  ```
-  Rails.application.configure do
-    config.logger = Logdna::Ruby.new(your_api_key, options)
-  end
-  ```
+```ruby
+Rails.application.configure do
+  config.logger = Logdna::Ruby.new(your_api_key, options)
+end
+```
 
 # Important Notes
 
@@ -140,7 +158,6 @@ Different log level displays log messages in different colors as well.
 # Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/logdna/ruby.
-
 
 
 # License
