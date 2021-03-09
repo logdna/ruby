@@ -105,6 +105,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "gregswift",
+      "name": "Greg Swift",
+      "avatar_url": "https://avatars.githubusercontent.com/u/372939?v=4",
+      "profile": "http://nytefyre.net/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
