@@ -87,6 +87,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "Deekor",
+      "name": "Dee Evans",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1904267?v=4",
+      "profile": "https://flybreeze.com/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7
