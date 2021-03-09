@@ -195,7 +195,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="http://blog.burningbush.us/"><img src="https://avatars.githubusercontent.com/u/6078?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jon Moses</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=jmoses" title="Tests">⚠️</a></td>
-    <td align="center"><a href="https://github.com/bnauta"><img src="https://avatars.githubusercontent.com/u/1395049?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Brad</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=bnauta" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/bnauta"><img src="https://avatars.githubusercontent.com/u/1395049?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Brad</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=bnauta" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=bnauta" title="Documentation">📖</a></td>
   </tr>
 </table>
 
