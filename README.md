@@ -1,7 +1,3 @@
-
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-17-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 <p align="center">
   <a href="https://app.logdna.com">
     <img height="95" width="201" src="https://raw.githubusercontent.com/logdna/artwork/master/logo%2Bruby.png">
@@ -10,6 +6,10 @@
 </p>
 
 ---
+
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-17-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 * **[Installation](#installation)**
 * **[Quick Setup](#quick-setup)**
@@ -156,16 +156,9 @@ Different log level displays log messages in different colors as well.
 - ![WARN Color](https://placehold.it/15/ec9563/000000?text=+)   "Warn"
 - ![ERROR Fatal Colors](https://placehold.it/15/e37e7d/000000?text=+)   "Error"  "Fatal"
 
-
-
 # Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/logdna/ruby.
-
-
-# License
-
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
 ## Contributors ✨
 
@@ -176,27 +169,27 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/smusali"><img src="https://avatars.githubusercontent.com/u/34287490?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Samir Musali</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=smusali" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=smusali" title="Documentation">📖</a> <a href="#maintenance-smusali" title="Maintenance">🚧</a></td>
-    <td align="center"><a href="https://github.com/jakedipity"><img src="https://avatars.githubusercontent.com/u/29671917?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jacob Hull</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=jakedipity" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/MattChoi1"><img src="https://avatars.githubusercontent.com/u/19616902?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Gun Woo choi</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=MattChoi1" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=MattChoi1" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/vilyapilya"><img src="https://avatars.githubusercontent.com/u/17367511?v=4?s=100" width="100px;" alt=""/><br /><sub><b>vilyapilya</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=vilyapilya" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=vilyapilya" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/respectus"><img src="https://avatars.githubusercontent.com/u/1046364?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Muaz Siddiqui</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=respectus" title="Code">💻</a> <a href="#maintenance-respectus" title="Maintenance">🚧</a> <a href="https://github.com/logdna/ruby/pulls?q=is%3Apr+reviewed-by%3Arespectus" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://github.com/badosu"><img src="https://avatars.githubusercontent.com/u/347552?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Amadeus Folego</b></sub></a><br /><a href="https://github.com/logdna/ruby/issues?q=author%3Abadosu" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://github.com/mansoorelahi"><img src="https://avatars.githubusercontent.com/u/858265?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mansoor</b></sub></a><br /><a href="https://github.com/logdna/ruby/issues?q=author%3Amansoorelahi" title="Bug reports">🐛</a></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="https://github.com/oleg-kiviljov"><img src="https://avatars.githubusercontent.com/u/10065250?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Oleg Kiviljov</b></sub></a><br /><a href="https://github.com/logdna/ruby/issues?q=author%3Aoleg-kiviljov" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/bnauta"><img src="https://avatars.githubusercontent.com/u/1395049?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Brad</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=bnauta" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=bnauta" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/dchai76"><img src="https://avatars.githubusercontent.com/u/13873467?v=4?s=100" width="100px;" alt=""/><br /><sub><b>DChai</b></sub></a><br /><a href="https://github.com/logdna/ruby/pulls?q=is%3Apr+reviewed-by%3Adchai76" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/logdna/ruby/commits?author=dchai76" title="Code">💻</a></td>
     <td align="center"><a href="https://flybreeze.com/"><img src="https://avatars.githubusercontent.com/u/1904267?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dee Evans</b></sub></a><br /><a href="https://github.com/logdna/ruby/issues?q=author%3ADeekor" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://github.com/machadolab"><img src="https://avatars.githubusercontent.com/u/1002843?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mike Machado</b></sub></a><br /><a href="https://github.com/logdna/ruby/issues?q=author%3Amachadolab" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://nytefyre.net/"><img src="https://avatars.githubusercontent.com/u/372939?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Greg Swift</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=gregswift" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/Kenneth-KT"><img src="https://avatars.githubusercontent.com/u/2994474?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kenneth-KT</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=Kenneth-KT" title="Code">💻</a></td>
-    <td align="center"><a href="https://ximian.io/"><img src="https://avatars.githubusercontent.com/u/518143?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Peter Jönsson</b></sub></a><br /><a href="#infra-mindjiver" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
-    <td align="center"><a href="https://github.com/zeldanut"><img src="https://avatars.githubusercontent.com/u/33665323?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Phil Ciampini</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=zeldanut" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=zeldanut" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/MattChoi1"><img src="https://avatars.githubusercontent.com/u/19616902?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Gun Woo choi</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=MattChoi1" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=MattChoi1" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/jakedipity"><img src="https://avatars.githubusercontent.com/u/29671917?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jacob Hull</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=jakedipity" title="Code">💻</a></td>
   </tr>
   <tr>
     <td align="center"><a href="http://blog.burningbush.us/"><img src="https://avatars.githubusercontent.com/u/6078?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jon Moses</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=jmoses" title="Tests">⚠️</a></td>
-    <td align="center"><a href="https://github.com/bnauta"><img src="https://avatars.githubusercontent.com/u/1395049?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Brad</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=bnauta" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=bnauta" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/dchai76"><img src="https://avatars.githubusercontent.com/u/13873467?v=4?s=100" width="100px;" alt=""/><br /><sub><b>DChai</b></sub></a><br /><a href="https://github.com/logdna/ruby/pulls?q=is%3Apr+reviewed-by%3Adchai76" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/logdna/ruby/commits?author=dchai76" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Kenneth-KT"><img src="https://avatars.githubusercontent.com/u/2994474?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kenneth-KT</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=Kenneth-KT" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/mansoorelahi"><img src="https://avatars.githubusercontent.com/u/858265?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mansoor</b></sub></a><br /><a href="https://github.com/logdna/ruby/issues?q=author%3Amansoorelahi" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/machadolab"><img src="https://avatars.githubusercontent.com/u/1002843?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mike Machado</b></sub></a><br /><a href="https://github.com/logdna/ruby/issues?q=author%3Amachadolab" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/respectus"><img src="https://avatars.githubusercontent.com/u/1046364?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Muaz Siddiqui</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=respectus" title="Code">💻</a> <a href="#maintenance-respectus" title="Maintenance">🚧</a> <a href="https://github.com/logdna/ruby/pulls?q=is%3Apr+reviewed-by%3Arespectus" title="Reviewed Pull Requests">👀</a></td>
+    <td align="center"><a href="https://github.com/oleg-kiviljov"><img src="https://avatars.githubusercontent.com/u/10065250?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Oleg Kiviljov</b></sub></a><br /><a href="https://github.com/logdna/ruby/issues?q=author%3Aoleg-kiviljov" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://ximian.io/"><img src="https://avatars.githubusercontent.com/u/518143?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Peter Jönsson</b></sub></a><br /><a href="#infra-mindjiver" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/zeldanut"><img src="https://avatars.githubusercontent.com/u/33665323?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Phil Ciampini</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=zeldanut" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=zeldanut" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/smusali"><img src="https://avatars.githubusercontent.com/u/34287490?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Samir Musali</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=smusali" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=smusali" title="Documentation">📖</a> <a href="#maintenance-smusali" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/vilyapilya"><img src="https://avatars.githubusercontent.com/u/17367511?v=4?s=100" width="100px;" alt=""/><br /><sub><b>vilyapilya</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=vilyapilya" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=vilyapilya" title="Documentation">📖</a></td>
   </tr>
 </table>
 
@@ -206,3 +199,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+# License
+
+The gem is available as open source under the terms of the [MIT License](./LICENSE).
+
