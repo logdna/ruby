@@ -69,6 +69,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "mansoorelahi",
+      "name": "Mansoor",
+      "avatar_url": "https://avatars.githubusercontent.com/u/858265?v=4",
+      "profile": "https://github.com/mansoorelahi",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7
