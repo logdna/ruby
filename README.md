@@ -1,6 +1,6 @@
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 <p align="center">
   <a href="https://app.logdna.com">
@@ -191,6 +191,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://nytefyre.net/"><img src="https://avatars.githubusercontent.com/u/372939?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Greg Swift</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=gregswift" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/Kenneth-KT"><img src="https://avatars.githubusercontent.com/u/2994474?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kenneth-KT</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=Kenneth-KT" title="Code">💻</a></td>
     <td align="center"><a href="https://ximian.io/"><img src="https://avatars.githubusercontent.com/u/518143?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Peter Jönsson</b></sub></a><br /><a href="#infra-mindjiver" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    <td align="center"><a href="https://github.com/zeldanut"><img src="https://avatars.githubusercontent.com/u/33665323?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Phil Ciampini</b></sub></a><br /><a href="https://github.com/logdna/ruby/commits?author=zeldanut" title="Code">💻</a> <a href="https://github.com/logdna/ruby/commits?author=zeldanut" title="Tests">⚠️</a></td>
   </tr>
 </table>
 

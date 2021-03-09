@@ -132,6 +132,16 @@
       "contributions": [
         "infra"
       ]
+    },
+    {
+      "login": "zeldanut",
+      "name": "Phil Ciampini",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33665323?v=4",
+      "profile": "https://github.com/zeldanut",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7
