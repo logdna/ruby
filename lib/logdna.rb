@@ -19,9 +19,7 @@ module Logdna
     attr_accessor :app, :env, :meta
 
     def initialize(key, opts = {})
-      super(nil, nil, nil)
       @app = opts[:app] || "default"
-      @log_level = opts[:level] || "INFO"
       @env = opts[:env]
       @meta = opts[:meta]
       @internal_logger = Logger.new($stdout)
@@ -43,28 +41,25 @@ module Logdna
       request.basic_auth("username", key)
       request[:'user-agent'] = opts[:'user-agent'] || "ruby/#{LogDNA::VERSION}"
       @client = Logdna::Client.new(request, uri, opts)
+
+      super(nil, nil, nil, level: opts[:level] || "INFO")
     end
 
     def default_opts
       {
         app: @app,
-        level: @log_level,
+        level: level,
         env: @env,
         meta: @meta,
       }
     end
 
-    def level
-      @log_level
-    end
-
     def level=(value)
-      if value.is_a? Numeric
-        @log_level = Resources::LOG_LEVELS[value]
-        return
-      end
+      return super(value) if value.is_a?(Integer)
 
-      @log_level = value
+      return super(Resources::TRACE) if value.to_s.downcase == 'trace'
+
+      super
     end
 
     def log(message = nil, opts = {})
@@ -89,17 +84,15 @@ module Logdna
                         level: lvl
                       ), &block)
       end
+    end
 
-      define_method "#{name}?" do
-        return Resources::LOG_LEVELS[self.level] == lvl if level.is_a? Numeric
-
-        self.level == lvl
-      end
+    def trace?
+      level <= Resources::TRACE
     end
 
     def clear
       @app = "default"
-      @log_level = "INFO"
+      level = Resources::LOG_LEVELS[1]
       @env = nil
       @meta = nil
     end

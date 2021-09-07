@@ -1,7 +1,9 @@
 # frozen_string_literal: true
-
+require 'logger'
 module Resources
+  TRACE = Logger::Severity::UNKNOWN
   LOG_LEVELS = %w[DEBUG INFO WARN ERROR FATAL TRACE].freeze
+
   DEFAULT_REQUEST_HEADER = { "Content-Type" => "application/json; charset=UTF-8" }.freeze
   DEFAULT_REQUEST_TIMEOUT = 180_000
   MS_IN_A_DAY = 86_400_000
