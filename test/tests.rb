@@ -80,4 +80,43 @@ class TestLogDNARuby < Minitest::Test
     log_level_test("debug", 2003, "DEBUG")
     retry_test("fatal", 2004, "FATAL")
   end
+
+  def test_log_level_helper_methods
+    debug_level_test
+    warn_level_test
+    trace_level_test
+  end
+
+  def debug_level_test
+    logger = Logdna::Ruby.new("pp", level: "DEBUG")
+
+    assert_equal(logger.debug?, true, "#debug? for 'DEBUG' level should be true")
+    assert_equal(logger.info?,  true,  "#info? for 'DEBUG' level should be true")
+    assert_equal(logger.warn?,  true,  "#warn? for 'DEBUG' level should be true")
+    assert_equal(logger.error?, true, "#error? for 'DEBUG' level should be true")
+    assert_equal(logger.fatal?, true, "#fatal? for 'DEBUG' level should be true")
+    assert_equal(logger.trace?, true, "#trace? for 'DEBUG' level should be true")
+  end
+
+  def warn_level_test
+    logger = Logdna::Ruby.new("pp", level: "WARN")
+
+    assert_equal(logger.debug?, false, "#debug? for 'WARN' level should be false")
+    assert_equal(logger.info?,  false,  "#info? for 'WARN' level should be false")
+    assert_equal(logger.warn?,  true,   "#warn? for 'WARN' level should be true")
+    assert_equal(logger.error?, true,  "#error? for 'WARN' level should be true")
+    assert_equal(logger.fatal?, true,  "#fatal? for 'WARN' level should be true")
+    assert_equal(logger.trace?, true,  "#trace? for 'WARN' level should be true")
+  end
+
+  def trace_level_test
+    logger = Logdna::Ruby.new("pp", level: "TRACE")
+
+    assert_equal(logger.debug?, false, "#debug? for 'TRACE' level should be false")
+    assert_equal(logger.info?,  false,  "#info? for 'TRACE' level should be false")
+    assert_equal(logger.warn?,  false,  "#warn? for 'TRACE' level should be false")
+    assert_equal(logger.error?, false, "#error? for 'TRACE' level should be false")
+    assert_equal(logger.fatal?, false, "#fatal? for 'TRACE' level should be false")
+    assert_equal(logger.trace?, true,  "#trace? for 'TRACE' level should be true")
+  end
 end
