@@ -126,7 +126,7 @@ end
 # Important Notes
 
 1. This logger assumes that you pass in json formatted data
-2. This logger is a singleton (do not create mutiple instances of the logger) even though the singleton structure is not strongly enforced.
+2. This logger is a singleton (do not create multiple instances of the logger) even though the singleton structure is not strongly enforced.
 
 # API
 
